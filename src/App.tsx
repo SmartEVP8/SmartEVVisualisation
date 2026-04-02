@@ -1,10 +1,13 @@
-import { MapView } from "./components/MapView";
+import { MapView } from "./components/map/MapView";
+import { useStations } from "./hooks/useStations";
 
 function App() {
+  const { stations, chargers } = useStations();
+
   return (
     <div className="h-screen w-screen relative bg-slate-950 text-white">
       {/* Map */}
-      <MapView />
+      <MapView stations={stations} chargers={chargers} />
 
       {/* Overlay UI */}
       <div className="absolute top-6 right-6 z-[1000]">
