@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import type { LatLngBoundsExpression } from 'leaflet';
 import type { Station, Charger } from '../../types/station';
@@ -25,6 +25,7 @@ export function MapView({ stations, chargers }: MapViewProps) {
       bounds={boundingBox}
       maxBounds={boundingBox}
       maxBoundsViscosity={1.0}
+      zoomControl={false}
     >
       <TileLayer
         url={`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${key}`}
@@ -54,6 +55,7 @@ export function MapView({ stations, chargers }: MapViewProps) {
           );
         })}
       </MarkerClusterGroup>
+      <ZoomControl position="bottomleft" />
     </MapContainer>
   );
 }
