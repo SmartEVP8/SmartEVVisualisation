@@ -1,12 +1,12 @@
-import { Marker, Popup, useMap } from 'react-leaflet';
+import { Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { Station, Charger } from '../../types/station';
-import { StationPopup } from './StationPopup';
 import stationMarkerIcon from '../../assets/StationMarker.svg';
 
 type Props = {
   station: Station;
   chargers?: Charger[];
+  onSelect: (station: Station, chargers: Charger[]) => void;
 };
 
 function createStationIcon() {
@@ -40,11 +40,10 @@ function createStationIcon() {
     `,
     iconSize: [40, 52],
     iconAnchor: [20, 52],
-    popupAnchor: [0, -52],
   });
 }
 
-export function StationMarker({ station, chargers = [] }: Props) {
+export function StationMarker({ station, chargers = [], onSelect }: Props) {
   const map = useMap();
   const icon = createStationIcon();
 
@@ -54,15 +53,13 @@ export function StationMarker({ station, chargers = [] }: Props) {
       icon={icon}
       eventHandlers={{
         click: () => {
-          map.flyTo([station.pos.lat, station.pos.lon], 17, {
-            duration: 0.8,
+          map.flyTo([station.pos.lat, station.pos.lon], 18, {
+            duration: 1.2,
           });
+
+          onSelect(station, chargers);
         },
       }}
-    >
-      <Popup>
-        <StationPopup station={station} chargers={chargers} />
-      </Popup>
-    </Marker>
+    />
   );
 }
