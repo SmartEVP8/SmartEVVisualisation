@@ -1,24 +1,12 @@
 import { fromBinary } from '@bufbuild/protobuf';
 import { EnvelopeSchema } from './generated/api_pb';
 import type { InitEngineConfig, InitEngineResponse } from './types';
+import { apiPostBinary } from './client';
 
 export async function initializeSimulation(
   config: InitEngineConfig
 ): Promise<InitEngineResponse> {
-  const response = await fetch('http://localhost:5000/init-engine', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(config),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Init failed: ${response.status} ${response.statusText}`);
-  }
-
-  const arrayBuffer = await response.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
+  const data = await apiPostBinary('/init-engine', config);
 
   console.log(`Received response (${data.length} bytes)`);
 
