@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package protocol;
+
+// ============================================================================
+// CORE TYPES
+// ============================================================================
+
+message Position {
+  double lat = 1;
+  double lon = 2;
+}
+
+message CostWeight {
+  int32 id = 1;
+  float updated_value = 2;
+}
+
+// ============================================================================
+// INITIALIZATION TYPES
+// ============================================================================
+
+message WeightRanges {
+  int32 id = 1;
+  float minimum = 2;
+  float maximum = 3;
+  string name = 4;
+}
+
+// Request to get possible weights, ids and their name and valid value ranges
+message GetValidWeightRanges { repeated WeightRanges weightRanges = 1; }
+
+message Charger {
+  int32 id = 1;
+  int32 max_power_kw = 2;
+  bool is_dual = 3;
+  int32 station_id = 4;
+}
+
+message StationInit {
+  uint32 id = 1;
+  Position pos = 2;
+  string address = 3;
+}
+
+message InitEngineData {
+  repeated CostWeight costWeights = 1;
+  repeated Charger chargers = 2;
+  repeated StationInit stations = 3;
+}
+
+// ============================================================================
+// STATE TYPES
+// ============================================================================
+
+message EVChargerState {
+  int32 ev_id = 1;
+  float soc = 2;
+  float target_soc = 3;
+}
+
+message ChargerState {
+  bool is_active = 1;
+  float utilization = 2;
+  uint32 charger_id = 3;
+  uint32 queue_size = 4;
+  repeated EVChargerState evs_in_queue = 5;
+}
+
+message EVOnRoute {
+  int32 ev_id = 1;
+  repeated Position waypoints = 2;
+}
+
+message StationState {
+  uint32 station_id = 1;
+  repeated ChargerState charger_states = 2;
+  repeated EVOnRoute evs_on_route = 3;
+}
+
+message SimulationSnapshot {
+  uint32 total_evs = 1;
+  uint32 total_charging = 2;
+  repeated StationState station_states = 3;
+  uint64 simulation_time_ms = 4;
+}
+
+// ============================================================================
+// CLIENT REQUEST TYPES (10-19)
+// ============================================================================
+
+message StationGenerationOptions {
+  float dual_charging_point_probability = 1;
+  int32 total_chargers = 2;
+}
+
+message InitRequest {
+  repeated CostWeight cost_weights = 1;
+  StationGenerationOptions station_generation = 2;
+  uint32 maximum_evs = 3;
+  int32 seed = 4;
+}
+
+message GetSnapshotRequest {
+  // Empty, but required for request/response symmetry
+}
+
+// ============================================================================
+// EVENT TYPES (Server -> Client pushes, 30-39)
+// ============================================================================
+
+message ArrivalEvent {
+  uint32 station_id = 1;
+  int32 ev_id = 2;
+  uint64 timestamp_ms = 3;
+}
+
+message ChargingEndEvent {
+  uint32 station_id = 1;
+  int32 ev_id = 2;
+  uint64 timestamp_ms = 3;
+}
+
+/*
+Message Envelope
+
+A wrapper message that can contain any of the defined message types.
+This allows us to have a single WebSocket endpoint that can handle all types of
+messages,
+*/
+message Envelope {
+  oneof payload {
+    // Client Requests (10-19)
+    InitRequest init = 10;
+    GetSnapshotRequest get_snapshot = 11;
+
+    // Server Responses (20-29)
+    SimulationSnapshot snapshot_response = 21; // response to GetSnapshotRequest
+    GetValidWeightRanges valid_weight_ranges = 23;
+
+    // Server Events/Pushes (30-39)
+    ArrivalEvent arrival = 30;
+    ChargingEndEvent charging_end = 31;
+    SimulationSnapshot state_update = 32;
+  }
+}
