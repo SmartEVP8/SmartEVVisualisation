@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file api.proto.
  */
 export const file_api: GenFile = /*@__PURE__*/
-  fileDesc("CglhcGkucHJvdG8SCHByb3RvY29sIiQKCFBvc2l0aW9uEgsKA2xhdBgBIAEoARILCgNsb24YAiABKAEiLwoKQ29zdFdlaWdodBIKCgJpZBgBIAEoBRIVCg11cGRhdGVkX3ZhbHVlGAIgASgCIkoKDFdlaWdodFJhbmdlcxIKCgJpZBgBIAEoBRIPCgdtaW5pbXVtGAIgASgCEg8KB21heGltdW0YAyABKAISDAoEbmFtZRgEIAEoCSJEChRHZXRWYWxpZFdlaWdodFJhbmdlcxIsCgx3ZWlnaHRSYW5nZXMYASADKAsyFi5wcm90b2NvbC5XZWlnaHRSYW5nZXMiUAoHQ2hhcmdlchIKCgJpZBgBIAEoBRIUCgxtYXhfcG93ZXJfa3cYAiABKAUSDwoHaXNfZHVhbBgDIAEoCBISCgpzdGF0aW9uX2lkGAQgASgFIksKC1N0YXRpb25Jbml0EgoKAmlkGAEgASgNEh8KA3BvcxgCIAEoCzISLnByb3RvY29sLlBvc2l0aW9uEg8KB2FkZHJlc3MYAyABKAkiiQEKDkluaXRFbmdpbmVEYXRhEikKC2Nvc3RXZWlnaHRzGAEgAygLMhQucHJvdG9jb2wuQ29zdFdlaWdodBIjCghjaGFyZ2VycxgCIAMoCzIRLnByb3RvY29sLkNoYXJnZXISJwoIc3RhdGlvbnMYAyADKAsyFS5wcm90b2NvbC5TdGF0aW9uSW5pdCJACg5FVkNoYXJnZXJTdGF0ZRINCgVldl9pZBgBIAEoBRILCgNzb2MYAiABKAISEgoKdGFyZ2V0X3NvYxgDIAEoAiKOAQoMQ2hhcmdlclN0YXRlEhEKCWlzX2FjdGl2ZRgBIAEoCBITCgt1dGlsaXphdGlvbhgCIAEoAhISCgpjaGFyZ2VyX2lkGAMgASgNEhIKCnF1ZXVlX3NpemUYBCABKA0SLgoMZXZzX2luX3F1ZXVlGAUgAygLMhgucHJvdG9jb2wuRVZDaGFyZ2VyU3RhdGUiQQoJRVZPblJvdXRlEg0KBWV2X2lkGAEgASgFEiUKCXdheXBvaW50cxgCIAMoCzISLnByb3RvY29sLlBvc2l0aW9uIn0KDFN0YXRpb25TdGF0ZRISCgpzdGF0aW9uX2lkGAEgASgNEi4KDmNoYXJnZXJfc3RhdGVzGAIgAygLMhYucHJvdG9jb2wuQ2hhcmdlclN0YXRlEikKDGV2c19vbl9yb3V0ZRgDIAMoCzITLnByb3RvY29sLkVWT25Sb3V0ZSKLAQoSU2ltdWxhdGlvblNuYXBzaG90EhEKCXRvdGFsX2V2cxgBIAEoDRIWCg50b3RhbF9jaGFyZ2luZxgCIAEoDRIuCg5zdGF0aW9uX3N0YXRlcxgDIAMoCzIWLnByb3RvY29sLlN0YXRpb25TdGF0ZRIaChJzaW11bGF0aW9uX3RpbWVfbXMYBCABKAQiWwoYU3RhdGlvbkdlbmVyYXRpb25PcHRpb25zEicKH2R1YWxfY2hhcmdpbmdfcG9pbnRfcHJvYmFiaWxpdHkYASABKAISFgoOdG90YWxfY2hhcmdlcnMYAiABKAUinAEKC0luaXRSZXF1ZXN0EioKDGNvc3Rfd2VpZ2h0cxgBIAMoCzIULnByb3RvY29sLkNvc3RXZWlnaHQSPgoSc3RhdGlvbl9nZW5lcmF0aW9uGAIgASgLMiIucHJvdG9jb2wuU3RhdGlvbkdlbmVyYXRpb25PcHRpb25zEhMKC21heGltdW1fZXZzGAMgASgNEgwKBHNlZWQYBCABKAUiFAoSR2V0U25hcHNob3RSZXF1ZXN0IkcKDEFycml2YWxFdmVudBISCgpzdGF0aW9uX2lkGAEgASgNEg0KBWV2X2lkGAIgASgFEhQKDHRpbWVzdGFtcF9tcxgDIAEoBCJLChBDaGFyZ2luZ0VuZEV2ZW50EhIKCnN0YXRpb25faWQYASABKA0SDQoFZXZfaWQYAiABKAUSFAoMdGltZXN0YW1wX21zGAMgASgEIoEDCghFbnZlbG9wZRIlCgRpbml0GAogASgLMhUucHJvdG9jb2wuSW5pdFJlcXVlc3RIABI0CgxnZXRfc25hcHNob3QYCyABKAsyHC5wcm90b2NvbC5HZXRTbmFwc2hvdFJlcXVlc3RIABI5ChFzbmFwc2hvdF9yZXNwb25zZRgVIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAEj0KE3ZhbGlkX3dlaWdodF9yYW5nZXMYFyABKAsyHi5wcm90b2NvbC5HZXRWYWxpZFdlaWdodFJhbmdlc0gAEikKB2Fycml2YWwYHiABKAsyFi5wcm90b2NvbC5BcnJpdmFsRXZlbnRIABIyCgxjaGFyZ2luZ19lbmQYHyABKAsyGi5wcm90b2NvbC5DaGFyZ2luZ0VuZEV2ZW50SAASNAoMc3RhdGVfdXBkYXRlGCAgASgLMhwucHJvdG9jb2wuU2ltdWxhdGlvblNuYXBzaG90SABCCQoHcGF5bG9hZGIGcHJvdG8z");
+  fileDesc("CglhcGkucHJvdG8SCHByb3RvY29sIiQKCFBvc2l0aW9uEgsKA2xhdBgBIAEoARILCgNsb24YAiABKAEiLwoKQ29zdFdlaWdodBIKCgJpZBgBIAEoBRIVCg11cGRhdGVkX3ZhbHVlGAIgASgCIkoKDFdlaWdodFJhbmdlcxIKCgJpZBgBIAEoBRIPCgdtaW5pbXVtGAIgASgCEg8KB21heGltdW0YAyABKAISDAoEbmFtZRgEIAEoCSJFChRHZXRWYWxpZFdlaWdodFJhbmdlcxItCg13ZWlnaHRfcmFuZ2VzGAEgAygLMhYucHJvdG9jb2wuV2VpZ2h0UmFuZ2VzIlAKB0NoYXJnZXISCgoCaWQYASABKAUSFAoMbWF4X3Bvd2VyX2t3GAIgASgFEg8KB2lzX2R1YWwYAyABKAgSEgoKc3RhdGlvbl9pZBgEIAEoBSJLCgtTdGF0aW9uSW5pdBIKCgJpZBgBIAEoDRIfCgNwb3MYAiABKAsyEi5wcm90b2NvbC5Qb3NpdGlvbhIPCgdhZGRyZXNzGAMgASgJIl4KDkluaXRFbmdpbmVEYXRhEiMKCGNoYXJnZXJzGAEgAygLMhEucHJvdG9jb2wuQ2hhcmdlchInCghzdGF0aW9ucxgCIAMoCzIVLnByb3RvY29sLlN0YXRpb25Jbml0IkAKDkVWQ2hhcmdlclN0YXRlEg0KBWV2X2lkGAEgASgFEgsKA3NvYxgCIAEoAhISCgp0YXJnZXRfc29jGAMgASgCIo4BCgxDaGFyZ2VyU3RhdGUSEQoJaXNfYWN0aXZlGAEgASgIEhMKC3V0aWxpemF0aW9uGAIgASgCEhIKCmNoYXJnZXJfaWQYAyABKA0SEgoKcXVldWVfc2l6ZRgEIAEoDRIuCgxldnNfaW5fcXVldWUYBSADKAsyGC5wcm90b2NvbC5FVkNoYXJnZXJTdGF0ZSJBCglFVk9uUm91dGUSDQoFZXZfaWQYASABKAUSJQoJd2F5cG9pbnRzGAIgAygLMhIucHJvdG9jb2wuUG9zaXRpb24ifQoMU3RhdGlvblN0YXRlEhIKCnN0YXRpb25faWQYASABKA0SLgoOY2hhcmdlcl9zdGF0ZXMYAiADKAsyFi5wcm90b2NvbC5DaGFyZ2VyU3RhdGUSKQoMZXZzX29uX3JvdXRlGAMgAygLMhMucHJvdG9jb2wuRVZPblJvdXRlIlsKElNpbXVsYXRpb25TbmFwc2hvdBIRCgl0b3RhbF9ldnMYASABKA0SFgoOdG90YWxfY2hhcmdpbmcYAiABKA0SGgoSc2ltdWxhdGlvbl90aW1lX21zGAMgASgEIlsKGFN0YXRpb25HZW5lcmF0aW9uT3B0aW9ucxInCh9kdWFsX2NoYXJnaW5nX3BvaW50X3Byb2JhYmlsaXR5GAEgASgCEhYKDnRvdGFsX2NoYXJnZXJzGAIgASgFIpwBCgtJbml0UmVxdWVzdBIqCgxjb3N0X3dlaWdodHMYASADKAsyFC5wcm90b2NvbC5Db3N0V2VpZ2h0Ej4KEnN0YXRpb25fZ2VuZXJhdGlvbhgCIAEoCzIiLnByb3RvY29sLlN0YXRpb25HZW5lcmF0aW9uT3B0aW9ucxITCgttYXhpbXVtX2V2cxgDIAEoDRIMCgRzZWVkGAQgASgFIhQKEkdldFNuYXBzaG90UmVxdWVzdCIoChJHZXRTdGF0aW9uU25hcHNob3QSEgoKc3RhdGlvbl9pZBgBIAEoDSJHCgxBcnJpdmFsRXZlbnQSEgoKc3RhdGlvbl9pZBgBIAEoDRINCgVldl9pZBgCIAEoBRIUCgx0aW1lc3RhbXBfbXMYAyABKAQiSwoQQ2hhcmdpbmdFbmRFdmVudBISCgpzdGF0aW9uX2lkGAEgASgNEg0KBWV2X2lkGAIgASgFEhQKDHRpbWVzdGFtcF9tcxgDIAEoBCKvBAoIRW52ZWxvcGUSJQoEaW5pdBgKIAEoCzIVLnByb3RvY29sLkluaXRSZXF1ZXN0SAASNAoMZ2V0X3NuYXBzaG90GAsgASgLMhwucHJvdG9jb2wuR2V0U25hcHNob3RSZXF1ZXN0SAASPAoUZ2V0X3N0YXRpb25fc25hcHNob3QYDCABKAsyHC5wcm90b2NvbC5HZXRTdGF0aW9uU25hcHNob3RIABI0ChBpbml0X2VuZ2luZV9kYXRhGBQgASgLMhgucHJvdG9jb2wuSW5pdEVuZ2luZURhdGFIABI5ChFzbmFwc2hvdF9yZXNwb25zZRgVIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAEj0KE3ZhbGlkX3dlaWdodF9yYW5nZXMYFyABKAsyHi5wcm90b2NvbC5HZXRWYWxpZFdlaWdodFJhbmdlc0gAEjgKFnN0YXRpb25fc3RhdGVfcmVzcG9uc2UYGCABKAsyFi5wcm90b2NvbC5TdGF0aW9uU3RhdGVIABIpCgdhcnJpdmFsGB4gASgLMhYucHJvdG9jb2wuQXJyaXZhbEV2ZW50SAASMgoMY2hhcmdpbmdfZW5kGB8gASgLMhoucHJvdG9jb2wuQ2hhcmdpbmdFbmRFdmVudEgAEjQKDHN0YXRlX3VwZGF0ZRggIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAQgkKB3BheWxvYWRiBnByb3RvMw");
 
 /**
  * @generated from message protocol.Position
@@ -95,7 +95,7 @@ export const WeightRangesSchema: GenMessage<WeightRanges> = /*@__PURE__*/
  */
 export type GetValidWeightRanges = Message<"protocol.GetValidWeightRanges"> & {
   /**
-   * @generated from field: repeated protocol.WeightRanges weightRanges = 1;
+   * @generated from field: repeated protocol.WeightRanges weight_ranges = 1;
    */
   weightRanges: WeightRanges[];
 };
@@ -171,17 +171,12 @@ export const StationInitSchema: GenMessage<StationInit> = /*@__PURE__*/
  */
 export type InitEngineData = Message<"protocol.InitEngineData"> & {
   /**
-   * @generated from field: repeated protocol.CostWeight costWeights = 1;
-   */
-  costWeights: CostWeight[];
-
-  /**
-   * @generated from field: repeated protocol.Charger chargers = 2;
+   * @generated from field: repeated protocol.Charger chargers = 1;
    */
   chargers: Charger[];
 
   /**
-   * @generated from field: repeated protocol.StationInit stations = 3;
+   * @generated from field: repeated protocol.StationInit stations = 2;
    */
   stations: StationInit[];
 };
@@ -321,12 +316,7 @@ export type SimulationSnapshot = Message<"protocol.SimulationSnapshot"> & {
   totalCharging: number;
 
   /**
-   * @generated from field: repeated protocol.StationState station_states = 3;
-   */
-  stationStates: StationState[];
-
-  /**
-   * @generated from field: uint64 simulation_time_ms = 4;
+   * @generated from field: uint64 simulation_time_ms = 3;
    */
   simulationTimeMs: bigint;
 };
@@ -408,6 +398,23 @@ export const GetSnapshotRequestSchema: GenMessage<GetSnapshotRequest> = /*@__PUR
   messageDesc(file_api, 14);
 
 /**
+ * @generated from message protocol.GetStationSnapshot
+ */
+export type GetStationSnapshot = Message<"protocol.GetStationSnapshot"> & {
+  /**
+   * @generated from field: uint32 station_id = 1;
+   */
+  stationId: number;
+};
+
+/**
+ * Describes the message protocol.GetStationSnapshot.
+ * Use `create(GetStationSnapshotSchema)` to create a new message.
+ */
+export const GetStationSnapshotSchema: GenMessage<GetStationSnapshot> = /*@__PURE__*/
+  messageDesc(file_api, 15);
+
+/**
  * @generated from message protocol.ArrivalEvent
  */
 export type ArrivalEvent = Message<"protocol.ArrivalEvent"> & {
@@ -432,7 +439,7 @@ export type ArrivalEvent = Message<"protocol.ArrivalEvent"> & {
  * Use `create(ArrivalEventSchema)` to create a new message.
  */
 export const ArrivalEventSchema: GenMessage<ArrivalEvent> = /*@__PURE__*/
-  messageDesc(file_api, 15);
+  messageDesc(file_api, 16);
 
 /**
  * @generated from message protocol.ChargingEndEvent
@@ -459,7 +466,7 @@ export type ChargingEndEvent = Message<"protocol.ChargingEndEvent"> & {
  * Use `create(ChargingEndEventSchema)` to create a new message.
  */
 export const ChargingEndEventSchema: GenMessage<ChargingEndEvent> = /*@__PURE__*/
-  messageDesc(file_api, 16);
+  messageDesc(file_api, 17);
 
 /**
  *
@@ -491,8 +498,22 @@ export type Envelope = Message<"protocol.Envelope"> & {
     case: "getSnapshot";
   } | {
     /**
+     * @generated from field: protocol.GetStationSnapshot get_station_snapshot = 12;
+     */
+    value: GetStationSnapshot;
+    case: "getStationSnapshot";
+  } | {
+    /**
      * Server Responses (20-29)
      *
+     * response to InitRequest
+     *
+     * @generated from field: protocol.InitEngineData init_engine_data = 20;
+     */
+    value: InitEngineData;
+    case: "initEngineData";
+  } | {
+    /**
      * response to GetSnapshotRequest
      *
      * @generated from field: protocol.SimulationSnapshot snapshot_response = 21;
@@ -505,6 +526,14 @@ export type Envelope = Message<"protocol.Envelope"> & {
      */
     value: GetValidWeightRanges;
     case: "validWeightRanges";
+  } | {
+    /**
+     * response to GetStationSnapshot
+     *
+     * @generated from field: protocol.StationState station_state_response = 24;
+     */
+    value: StationState;
+    case: "stationStateResponse";
   } | {
     /**
      * Server Events/Pushes (30-39)
@@ -533,5 +562,5 @@ export type Envelope = Message<"protocol.Envelope"> & {
  * Use `create(EnvelopeSchema)` to create a new message.
  */
 export const EnvelopeSchema: GenMessage<Envelope> = /*@__PURE__*/
-  messageDesc(file_api, 17);
+  messageDesc(file_api, 18);
 

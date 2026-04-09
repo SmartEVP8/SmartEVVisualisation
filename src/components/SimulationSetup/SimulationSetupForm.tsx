@@ -1,27 +1,75 @@
 import { useState } from 'react';
 import * as Form from '@radix-ui/react-form';
+import * as z from 'zod';
 import { ConfigFormCard } from './ConfigFormCard';
 import { NumberField } from '../UI/NumberField';
 import { SliderField } from '../UI/SliderField';
-import type { WeightMetadata } from '../../api/types';
-import type { InitRequest } from '../../types/simulationConfig';
+import type { WeightMetadata, InitEngineConfig } from '../../api/types';
+import { initializeSimulation } from '../../api/init';
 
 type SimulationSetupFormProps = {
   onClose: () => void;
   weightMetadata: WeightMetadata[];
-  initialCostWeights: InitRequest['costWeights'];
-  onStart?: (config: InitRequest) => void;
+  initialCostWeights: InitEngineConfig['costWeights'];
+  onStart?: (config: InitEngineConfig) => void;
 };
 
+const simulationConfigSchema = (weightMetadata: WeightMetadata[]) => 
+  z.object({
+  maximumEVs: z.number().min(1, 'Must be at least 1').max(550000, 'Must be at most 550000'),
+  seed: z.number().min(0, 'Must be at least 0'),
+  dualChargingProbability: z
+    .number()
+    .min(0, 'Must be at least 0')
+    .max(1, 'Must be at most 1'),
+  numberOfChargers: z.number().min(1, 'Must be at least 1').max(7500, 'Must be at most 2500'),
+  costWeights: z.array(
+    z.object({
+      costId: z.number(),
+      value: z.number(),
+    })
+  ).superRefine((costWeights, ctx) => {
+    costWeights.forEach((weight, index) => {
+      const costWeight = weightMetadata.find((cw) => cw.id === weight.costId);
+
+      if (!costWeight) {
+        ctx.addIssue({
+          expected: 'valid costId',
+          code: 'invalid_type',
+          message: `Missing weight for cost ID ${weight.costId}`,
+          path: [index, "costId"],
+        });
+        return;
+      }
+
+      if (weight.value < costWeight.min) {
+        ctx.addIssue({
+          expected: 'number greater than or equal to ' + costWeight.min,
+          code: 'custom',
+          message: `Weight value for cost ID ${weight.costId} must be at least ${costWeight.min}`,
+          path: ['costWeights', index, "value"],
+        });
+      }
+
+      if (weight.value > costWeight.max) {
+        ctx.addIssue({
+          expected: 'number less than or equal to ' + costWeight.max,
+          code: 'custom',
+          message: `Weight value for cost ID ${weight.costId} must be at most ${costWeight.max}`,
+          path: ['costWeights', index, "value"],
+        });
+      }
+    });
+  }),
+});
+
 const createInitialConfig = (
-  initialCostWeights: InitRequest['costWeights']
-): InitRequest => ({
+  initialCostWeights: InitEngineConfig['costWeights']
+): InitEngineConfig => ({
   costWeights: initialCostWeights,
-  stationGenerationOptions: {
-    dualChargingProbability: 0.8,
-    numberOfChargers: 2400,
-  },
-  maximumNumberOfEVs: 500000,
+  dualChargingProbability: 0.8,
+  numberOfChargers: 5000,
+  maximumEVs: 500000,
   seed: 42,
 });
 
@@ -31,13 +79,26 @@ export function SimulationSetupForm({
   initialCostWeights,
   onStart,
 }: SimulationSetupFormProps) {
-  const [config, setConfig] = useState<InitRequest>(() =>
+  const [config, setConfig] = useState<InitEngineConfig>(() =>
     createInitialConfig(initialCostWeights)
   );
 
+  const schema = simulationConfigSchema(weightMetadata);
+
   const handleStart = () => {
-    console.log("Starting simulation with config:", config);
-    onStart?.(config);
+    console.log('Initializing simulation with config:', config);
+    schema.parse(config);
+    initializeSimulation(config)
+      .then((response) => {
+        console.log('Simulation initialized with response:', response);
+        onStart?.(config);
+      })
+      .catch((error) => {
+        if (error instanceof z.ZodError){
+          console.error('Validation errors:', error.issues);
+        }
+        console.error('Failed to initialize simulation:', error);
+      });
   };
 
   return (
@@ -51,13 +112,13 @@ export function SimulationSetupForm({
       >
         <div className="flex flex-col gap-5">
           <NumberField
-            name="maximumNumberOfEVs"
+            name="maximumEVs"
             label="Number of EVs"
-            value={config.maximumNumberOfEVs}
+            value={config.maximumEVs}
             onChange={(value) =>
               setConfig((prev) => ({
                 ...prev,
-                maximumNumberOfEVs: value,
+                maximumEVs: value,
               }))
             }
           />
@@ -77,17 +138,14 @@ export function SimulationSetupForm({
           <SliderField
             name="dualChargingProbability"
             label="Probability of Dual Charger"
-            value={config.stationGenerationOptions.dualChargingProbability}
+            value={config.dualChargingProbability}
             min={0}
             max={1}
             step={0.1}
             onChange={(value) =>
               setConfig((prev) => ({
                 ...prev,
-                stationGenerationOptions: {
-                  ...prev.stationGenerationOptions,
-                  dualChargingProbability: value,
-                },
+                dualChargingProbability: value,
               }))
             }
           />
@@ -95,14 +153,11 @@ export function SimulationSetupForm({
           <NumberField
             name="numberOfChargers"
             label="Number of Chargers"
-            value={config.stationGenerationOptions.numberOfChargers}
+            value={config.numberOfChargers}
             onChange={(value) =>
               setConfig((prev) => ({
                 ...prev,
-                stationGenerationOptions: {
-                  ...prev.stationGenerationOptions,
-                  numberOfChargers: value,
-                },
+                numberOfChargers: value,
               }))
             }
           />
@@ -116,8 +171,8 @@ export function SimulationSetupForm({
           <div className="flex flex-col gap-5">
             {weightMetadata.map((weight) => {
               const value =
-                config.costWeights.find((item) => item.id === weight.id)
-                  ?.updatedValue ?? weight.min;
+                config.costWeights.find((item) => item.costId === weight.id)
+                  ?.value ?? weight.min;
 
               return (
                 <SliderField
@@ -132,8 +187,8 @@ export function SimulationSetupForm({
                     setConfig((prev) => ({
                       ...prev,
                       costWeights: prev.costWeights.map((item) =>
-                        item.id === weight.id
-                          ? { ...item, updatedValue: newValue }
+                        item.costId === weight.id
+                          ? { ...item, value: newValue }
                           : item
                       ),
                     }))
