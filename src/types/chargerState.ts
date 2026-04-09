@@ -9,6 +9,5 @@ export type ChargerState = {
   utilization: number;
   chargerId: number;
   queueSize: number;
-  activeEVId: EVChargerState | null;
   evsInQueue: EVChargerState[];
 };

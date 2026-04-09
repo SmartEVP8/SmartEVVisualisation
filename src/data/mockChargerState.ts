@@ -12,7 +12,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.91,
     queueSize: 3,
-    activeEVId: { evID: 1000, SoC: 0.35, targetSoC: 0.9 },
     evsInQueue: [
       { evID: 1001, SoC: 0.18, targetSoC: 0.8 },
       { evID: 1002, SoC: 0.27, targetSoC: 0.85 },
@@ -24,7 +23,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.76,
     queueSize: 2,
-    activeEVId: { evID: 1004, SoC: 0.22, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1004, SoC: 0.22, targetSoC: 0.8 },
       { evID: 1005, SoC: 0.41, targetSoC: 0.9 },
@@ -35,7 +33,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.64,
     queueSize: 1,
-    activeEVId: { evID: 1006, SoC: 0.29, targetSoC: 0.75 },
     evsInQueue: [{ evID: 1006, SoC: 0.29, targetSoC: 0.75 }],
   },
   {
@@ -43,7 +40,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.88,
     queueSize: 3,
-    activeEVId: { evID: 1007, SoC: 0.12, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1007, SoC: 0.12, targetSoC: 0.8 },
       { evID: 1008, SoC: 0.25, targetSoC: 0.85 },
@@ -55,7 +51,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.57,
     queueSize: 2,
-    activeEVId: { evID: 1010, SoC: 0.31, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1010, SoC: 0.31, targetSoC: 0.8 },
       { evID: 1011, SoC: 0.48, targetSoC: 0.85 },
@@ -66,7 +61,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.83,
     queueSize: 1,
-    activeEVId: { evID: 1012, SoC: 0.2, targetSoC: 0.8 },
     evsInQueue: [{ evID: 1012, SoC: 0.2, targetSoC: 0.8 }],
   },
 
@@ -80,7 +74,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.72,
     queueSize: 2,
-    activeEVId: { evID: 1100, SoC: 0.26, targetSoC: 0.85 },
     evsInQueue: [
       { evID: 1101, SoC: 0.24, targetSoC: 0.8 },
       { evID: 1102, SoC: 0.37, targetSoC: 0.9 },
@@ -91,7 +84,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.49,
     queueSize: 1,
-    activeEVId: { evID: 1103, SoC: 0.44, targetSoC: 0.8 },
     evsInQueue: [{ evID: 1103, SoC: 0.44, targetSoC: 0.8 }],
   },
   {
@@ -99,7 +91,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -107,7 +98,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
 
@@ -121,7 +111,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -129,7 +118,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -137,7 +125,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -145,7 +132,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -153,7 +139,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -161,7 +146,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
 
@@ -175,7 +159,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.94,
     queueSize: 3,
-    activeEVId: { evID: 1200, SoC: 0.19, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1201, SoC: 0.14, targetSoC: 0.85 },
       { evID: 1202, SoC: 0.26, targetSoC: 0.8 },
@@ -187,7 +170,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.81,
     queueSize: 2,
-    activeEVId: { evID: 1204, SoC: 0.32, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1204, SoC: 0.32, targetSoC: 0.8 },
       { evID: 1205, SoC: 0.46, targetSoC: 0.85 },
@@ -198,7 +180,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.68,
     queueSize: 1,
-    activeEVId: { evID: 1206, SoC: 0.28, targetSoC: 0.75 },
     evsInQueue: [{ evID: 1206, SoC: 0.28, targetSoC: 0.75 }],
   },
   {
@@ -206,7 +187,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.87,
     queueSize: 2,
-    activeEVId: { evID: 1207, SoC: 0.23, targetSoC: 0.85 },
     evsInQueue: [
       { evID: 1207, SoC: 0.23, targetSoC: 0.85 },
       { evID: 1208, SoC: 0.38, targetSoC: 0.9 },
@@ -217,7 +197,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.79,
     queueSize: 3,
-    activeEVId: { evID: 1208, SoC: 0.38, targetSoC: 0.9 },
     evsInQueue: [
       { evID: 1209, SoC: 0.11, targetSoC: 0.8 },
       { evID: 1210, SoC: 0.19, targetSoC: 0.85 },
@@ -229,7 +208,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.62,
     queueSize: 1,
-    activeEVId: { evID: 1211, SoC: 0.42, targetSoC: 0.9 },
     evsInQueue: [{ evID: 1212, SoC: 0.4, targetSoC: 0.8 }],
   },
   {
@@ -237,7 +215,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.9,
     queueSize: 2,
-    activeEVId: { evID: 1212, SoC: 0.4, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1213, SoC: 0.21, targetSoC: 0.85 },
       { evID: 1214, SoC: 0.33, targetSoC: 0.9 },
@@ -254,7 +231,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.85,
     queueSize: 2,
-    activeEVId: { evID: 1300, SoC: 0.3, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1301, SoC: 0.16, targetSoC: 0.8 },
       { evID: 1302, SoC: 0.29, targetSoC: 0.9 },
@@ -265,7 +241,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.58,
     queueSize: 1,
-    activeEVId: { evID: 1303, SoC: 0.36, targetSoC: 0.8 },
     evsInQueue: [{ evID: 1303, SoC: 0.36, targetSoC: 0.8 }],
   },
   {
@@ -273,7 +248,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.67,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -281,7 +255,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -289,7 +262,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -297,7 +269,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.71,
     queueSize: 1,
-    activeEVId: { evID: 1304, SoC: 0.27, targetSoC: 0.85 },
     evsInQueue: [{ evID: 1304, SoC: 0.27, targetSoC: 0.85 }],
   },
   {
@@ -305,7 +276,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -313,7 +283,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.53,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
 
@@ -327,7 +296,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.89,
     queueSize: 3,
-    activeEVId: { evID: 1400, SoC: 0.18, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1401, SoC: 0.15, targetSoC: 0.8 },
       { evID: 1402, SoC: 0.28, targetSoC: 0.85 },
@@ -339,7 +307,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.74,
     queueSize: 2,
-    activeEVId: { evID: 1404, SoC: 0.22, targetSoC: 0.8 },
     evsInQueue: [
       { evID: 1404, SoC: 0.22, targetSoC: 0.8 },
       { evID: 1405, SoC: 0.41, targetSoC: 0.9 },
@@ -350,7 +317,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.61,
     queueSize: 1,
-    activeEVId: { evID: 1406, SoC: 0.39, targetSoC: 0.8 },
     evsInQueue: [{ evID: 1406, SoC: 0.39, targetSoC: 0.8 }],
   },
   {
@@ -358,7 +324,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: true,
     utilization: 0.82,
     queueSize: 2,
-    activeEVId: { evID: 1407, SoC: 0.25, targetSoC: 0.85 },
     evsInQueue: [
       { evID: 1407, SoC: 0.25, targetSoC: 0.85 },
       { evID: 1408, SoC: 0.31, targetSoC: 0.9 },
@@ -375,7 +340,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -383,7 +347,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -391,7 +354,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -399,7 +361,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -407,7 +368,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -415,7 +375,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
   {
@@ -423,7 +382,6 @@ export const mockChargerStates: ChargerState[] = [
     isActive: false,
     utilization: 0,
     queueSize: 0,
-    activeEVId: null,
     evsInQueue: [],
   },
 ];

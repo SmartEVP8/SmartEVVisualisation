@@ -1,14 +1,7 @@
-import { MapView } from "./components/map/MapView";
-import { useStations } from "./hooks/useStations";
+import { SimulationPage } from './pages/SimulationPage';
 
 function App() {
-  const { stations, chargers, chargerStates } = useStations();
-
-  return (
-    <div className="h-screen w-screen relative bg-slate-950 text-white">
-      <MapView stations={stations} chargers={chargers} chargerStates={chargerStates} />
-    </div>
-  );
+  return <SimulationPage />;
 }
 
 export default App;
