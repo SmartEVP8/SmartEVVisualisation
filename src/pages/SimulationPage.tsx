@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import type { InitEngineConfig } from '../api/types';
 import { MapView } from '../components/map/MapView';
 import { StationMarker } from '../components/map/StationMarker';
-import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
-import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
-import { ChargerSidebar } from '../components/SimulationPage/ChargerSidebar';
+import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
+import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import { useSimulationData } from '../hooks/useSimulationData';
 import { useSimulationSetupWeights } from '../hooks/useSimulationSetupWeights';
 import { useStationSelection } from '../hooks/useStationSelection';
@@ -34,14 +35,9 @@ export function SimulationPage() {
 
   const {
     selectedStation,
-    selectedChargerId,
-    selectedCharger,
-    selectedChargerState,
     chargerStatesByChargerId,
-    setSelectedChargerId,
     selectStation,
     closeStation,
-    closeCharger,
     resetSelection,
   } = useStationSelection({ chargerStates });
 
@@ -57,7 +53,7 @@ export function SimulationPage() {
     return map;
   }, [chargers]);
 
-  const handleStartSimulation = async (config: any) => {
+  const handleStartSimulation = async (config: InitEngineConfig) => {
     try {
       await startSimulation(config);
       close();
@@ -68,7 +64,7 @@ export function SimulationPage() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-slate-950 text-white">
+    <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
       <MapView>
         {hasSimulationStarted && (
           <MarkerClusterGroup
@@ -93,7 +89,7 @@ export function SimulationPage() {
         )}
       </MapView>
 
-      <div className="absolute left-4 top-4 z-[1000] w-[280px]">
+      <div className="absolute top-4 left-4 z-[1000] w-[280px]">
         {!hasSimulationStarted && (
           <StartSimulationButton
             onOpen={open}
@@ -102,11 +98,15 @@ export function SimulationPage() {
         )}
 
         {weightsError && !isOpen && (
-          <div className="mt-3 text-sm text-red-400">{weightsError}</div>
+          <Alert variant="destructive" className="mt-3">
+            <AlertDescription>{weightsError}</AlertDescription>
+          </Alert>
         )}
 
         {simulationError && !isOpen && (
-          <div className="mt-3 text-sm text-red-400">{simulationError}</div>
+          <Alert variant="destructive" className="mt-3">
+            <AlertDescription>{simulationError}</AlertDescription>
+          </Alert>
         )}
       </div>
 
@@ -122,21 +122,11 @@ export function SimulationPage() {
       )}
 
       {hasSimulationStarted && (
-        <>
-          <StationSidebar
-            selectedStation={selectedStation}
-            selectedChargerId={selectedChargerId}
-            chargerStatesByChargerId={chargerStatesByChargerId}
-            onClose={closeStation}
-            onSelectCharger={setSelectedChargerId}
-          />
-
-          <ChargerSidebar
-            selectedCharger={selectedCharger}
-            selectedChargerState={selectedChargerState}
-            onClose={closeCharger}
-          />
-        </>
+        <StationSidebar
+          selectedStation={selectedStation}
+          chargerStatesByChargerId={chargerStatesByChargerId}
+          onClose={closeStation}
+        />
       )}
     </div>
   );
