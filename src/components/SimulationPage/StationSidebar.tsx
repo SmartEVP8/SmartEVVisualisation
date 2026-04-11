@@ -1,10 +1,11 @@
-import { Battery, Plug } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Battery, ChevronLeft, ChevronRight, Plug, Road } from 'lucide-react';
+import { useState } from 'react';
 import type { ChargerState } from '../../types/chargerState';
 import { fakeEVChargerStates } from '../../types/chargerState';
 import type { Charger, Station } from '../../types/station';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader } from '../ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 type StationSidebarProps = {
   selectedStation: {
@@ -13,32 +14,53 @@ type StationSidebarProps = {
   } | null;
   chargerStatesByChargerId: Map<number, ChargerState>;
   onClose: () => void;
+  onShowIncomingRoutes: () => void;
 };
 
 export function StationSidebar({
   selectedStation,
   chargerStatesByChargerId,
   onClose,
+  onShowIncomingRoutes,
 }: StationSidebarProps) {
   const isOpen = selectedStation !== null;
-  const [selectedChargerId, setSelectedChargerId] = useState<number | null>(
-    selectedStation?.chargers[0]?.id ?? null
-  );
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selectedChargerSelection, setSelectedChargerSelection] = useState<{
+    stationId: number;
+    chargerId: number;
+  } | null>(null);
 
-  useEffect(() => {
-    if (!selectedStation?.chargers.length) {
-      setSelectedChargerId(null);
+  const selectedChargerId =
+    selectedStation && selectedChargerSelection?.stationId === selectedStation.station.id
+      ? selectedChargerSelection.chargerId
+      : null;
+
+  const sidebarWidthClass = selectedChargerId === null ? 'w-[26rem]' : 'w-[40rem]';
+
+  const handleClose = () => {
+    setIsCollapsed(false);
+    setSelectedChargerSelection(null);
+    onClose();
+  };
+
+  const handleSelectCharger = (chargerId: number) => {
+    if (!selectedStation) {
       return;
     }
 
-    setSelectedChargerId((current) => {
-      if (current !== null && selectedStation.chargers.some((charger) => charger.id === current)) {
-        return current;
-      }
+    if (
+      selectedChargerSelection?.stationId === selectedStation.station.id &&
+      selectedChargerSelection.chargerId === chargerId
+    ) {
+      setSelectedChargerSelection(null);
+      return;
+    }
 
-      return selectedStation.chargers[0].id;
+    setSelectedChargerSelection({
+      stationId: selectedStation.station.id,
+      chargerId,
     });
-  }, [selectedStation]);
+  };
 
   // Stats helpers
   const getActiveChargerCount = () => {
@@ -62,14 +84,14 @@ export function StationSidebar({
       <Card
         key={charger.id}
         size="sm"
-        onClick={() => setSelectedChargerId(charger.id)}
+        onClick={() => handleSelectCharger(charger.id)}
         role="button"
         tabIndex={0}
         aria-pressed={isSelected}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            setSelectedChargerId(charger.id);
+            handleSelectCharger(charger.id);
           }
         }}
         className={`cursor-pointer rounded-2xl border text-left transition-all duration-200 p-4 ${
@@ -90,8 +112,8 @@ export function StationSidebar({
         <CardContent className="px-0 py-0">
           <div className="space-y-2.5 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Max Power</span>
-              <span className="font-medium">{charger.maxPowerKW} kW</span>
+              <span className="text-muted-foreground">Max Energy</span>
+              <span className="font-medium">{charger.maxEnergyKWh} kWh</span>
             </div>
 
             <div className="flex justify-between">
@@ -133,7 +155,7 @@ export function StationSidebar({
       <CardContent className="px-0 py-0">
         <div className="space-y-3">
           <div>
-            <div className="mb-2 flex items-end justify-between">
+            <div className="mb-2 flex items-baseline justify-between">
               <span className="text-xs text-muted-foreground">Charging Progress</span>
               <span className="text-lg font-bold">{Math.round(ev.SoC * 100)}% → {Math.round(ev.targetSoC * 100)}%</span>
             </div>
@@ -158,33 +180,75 @@ export function StationSidebar({
   return (
     <Card
       className={`
-        absolute top-6 right-6 bottom-6 z-1000
-        flex w-[48rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden
+        absolute top-6 right-6 bottom-6 z-400
+        flex ${sidebarWidthClass} max-w-[calc(100vw-3rem)] flex-col overflow-hidden
         rounded-[2.5rem_2.5rem_0_2.5rem]
         border-border/80 bg-card/95 shadow-2xl backdrop-blur-md
         transition-all duration-300
-        ${isOpen ? 'opacity-100' : 'translate-x-[110%] pointer-events-none opacity-0'}
+        ${
+          isOpen
+            ? isCollapsed
+              ? 'translate-x-[calc(100%-4.25rem)] opacity-100'
+              : 'translate-x-0 opacity-100'
+            : 'translate-x-[110%] pointer-events-none opacity-0'
+        }
       `}
     >
       <div className="flex items-start justify-between gap-4 border-b border-border/70 p-6 pb-4">
-        <h2 className="text-2xl leading-tight font-semibold wrap-break-word">
-          {selectedStation?.station.address ?? 'Station'}
-        </h2>
+        <div className="flex min-w-0 items-start gap-3">
+          <Button
+            type="button"
+            size="icon"
+            variant="secondary"
+            onClick={() => setIsCollapsed((current) => !current)}
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="relative z-30 h-10 w-10 shrink-0 rounded-full"
+          >
+            {isCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </Button>
 
-        <Button
-          onClick={onClose}
-          type="button"
-          size="icon"
-          variant="outline"
-          className="h-10 w-10 rounded-full text-xl"
-        >
-          ×
-        </Button>
+          <h2 className="text-2xl leading-tight font-semibold wrap-break-word">
+            {selectedStation?.station.address ?? 'Station'}
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-2">
+       
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={onShowIncomingRoutes}
+                  className="h-10 w-10 rounded-full"
+                  aria-label="Show incoming EVs"
+                >
+                  <Road className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Show incoming EVs</TooltipContent>
+            </Tooltip>
+       
+
+          <Button
+            onClick={handleClose}
+            type="button"
+            size="icon"
+            variant="outline"
+            className="h-10 w-10 rounded-full text-xl"
+          >
+            ×
+          </Button>
+        </div>
       </div>
 
       {selectedStation?.chargers.length ? (
         <div className="border-b border-border/50 px-5 py-4">
-          <div className="grid grid-cols-4 gap-2 text-center text-xs">
+          <div
+            className={`grid gap-2 text-center text-xs ${
+              selectedChargerId === null ? 'grid-cols-2' : 'grid-cols-4'
+            }`}
+          >
             <div className="rounded-lg bg-muted/30 p-2">
               <p className="text-muted-foreground text-[10px] font-semibold uppercase">Chargers</p>
               <p className="text-base font-bold">{selectedStation.chargers.length}</p>
@@ -205,34 +269,47 @@ export function StationSidebar({
         </div>
       ) : null}
 
-      <div className="flex flex-1 flex-col gap-4 overflow-hidden p-5">
+      <div
+        className={`flex flex-1 flex-col gap-4 overflow-hidden p-5 transition-opacity duration-200 ${
+          isCollapsed ? 'pointer-events-none opacity-20' : 'opacity-100'
+        }`}
+      >
         {selectedStation?.chargers.length ? (
-          <div className="flex gap-4 flex-1 overflow-hidden">
-            {/* Chargers List - Left */}
-            <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex flex-1 gap-4 overflow-hidden">
+            <div className="flex min-w-0 flex-1 flex-col">
               <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Chargers
               </p>
-              <div className="space-y-3 overflow-y-auto flex-1">
+              <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
                 {selectedStation.chargers.map(renderChargerCard)}
               </div>
             </div>
 
-            {/* Queue - Right */}
             {selectedChargerId !== null && (
-              <div className="flex flex-col flex-1 min-w-0 border-l border-border/30 pl-4">
-                <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Queue for Charger {selectedChargerId}
-                </p>
+              <div className="flex min-w-0 flex-1 flex-col border-l border-border/30 pl-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Queue for Charger {selectedChargerId}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedChargerSelection(null)}
+                    className="h-7 px-2 text-xs"
+                  >
+                    Clear
+                  </Button>
+                </div>
 
                 {(() => {
                   const selectedChargerState = chargerStatesByChargerId.get(selectedChargerId);
-                  const queueItems = selectedChargerState?.evsInQueue && selectedChargerState.evsInQueue.length > 0 
-                    ? selectedChargerState.evsInQueue 
+                  const queueItems = selectedChargerState?.evsInQueue && selectedChargerState.evsInQueue.length > 0
+                    ? selectedChargerState.evsInQueue
                     : fakeEVChargerStates;
-                  
+
                   return queueItems.length > 0 ? (
-                    <div className="space-y-3 overflow-y-auto flex-1">
+                    <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
                       {queueItems.map(renderQueueItem)}
                     </div>
                   ) : (
