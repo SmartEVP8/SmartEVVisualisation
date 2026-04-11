@@ -29,7 +29,7 @@ export type InitEngineStation = {
 
 export type InitEngineCharger = {
   id: number;
-  maxPowerKw: number;
+  maxEnergyKWh: number;
   stationId: number;
   isDual: boolean;
 };

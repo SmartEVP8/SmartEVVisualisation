@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { initializeSimulation } from '../api/init';
 import type { InitEngineConfig, InitEngineResponse } from '../api/types';
-import type { Station, Charger } from '../types/station';
 import type { ChargerState } from '../types/chargerState';
+import type { Charger, Station } from '../types/station';
 
 function mapInitResponseToStations(response: InitEngineResponse): Station[] {
   return response.stations.map((station) => ({
@@ -18,7 +18,7 @@ function mapInitResponseToStations(response: InitEngineResponse): Station[] {
 function mapInitResponseToChargers(response: InitEngineResponse): Charger[] {
   return response.chargers.map((charger) => ({
     id: charger.id,
-    maxPowerKW: charger.maxPowerKw,
+    maxEnergyKWh: charger.maxEnergyKWh,
     isDual: charger.isDual,
     stationId: charger.stationId,
   }));

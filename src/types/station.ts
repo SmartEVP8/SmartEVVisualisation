@@ -11,7 +11,7 @@ export type Station = {
 
 export type Charger = {
   id: number;
-  maxPowerKW: number;
+  maxEnergyKWh: number;
   isDual: boolean;
   stationId: number;
 };

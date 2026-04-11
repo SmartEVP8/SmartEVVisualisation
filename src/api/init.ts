@@ -1,7 +1,7 @@
 import { fromBinary } from '@bufbuild/protobuf';
+import { apiPostBinary } from './client';
 import { EnvelopeSchema } from './generated/api_pb';
 import type { InitEngineConfig, InitEngineResponse } from './types';
-import { apiPostBinary } from './client';
 
 export async function initializeSimulation(
   config: InitEngineConfig
@@ -35,7 +35,7 @@ export async function initializeSimulation(
     })),
     chargers: initData.chargers.map((charger) => ({
       id: charger.id,
-      maxPowerKw: charger.maxPowerKw,
+      maxEnergyKWh: charger.maxPowerKw,
       stationId: charger.stationId,
       isDual: charger.isDual,
     })),
