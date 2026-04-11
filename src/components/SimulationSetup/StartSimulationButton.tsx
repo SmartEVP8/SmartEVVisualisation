@@ -1,3 +1,5 @@
+import { Button } from '../ui/button';
+
 type StartSimulationButtonProps = {
   onOpen: () => void;
   disabled?: boolean;
@@ -10,19 +12,15 @@ export function StartSimulationButton({
   isLoading = false,
 }: StartSimulationButtonProps) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onOpen}
       disabled={disabled || isLoading}
-      className="
-        w-full rounded-2xl border border-neutral-700
-        bg-neutral-950/90 px-4 py-3 text-left text-base font-semibold text-white
-        shadow-lg backdrop-blur-sm transition
-        hover:bg-neutral-900
-        disabled:cursor-not-allowed disabled:opacity-60
-      "
+      variant="outline"
+      size="lg"
+      className="h-12 w-full justify-start rounded-2xl border-border/80 bg-card/95 px-4 text-left text-base font-semibold shadow-lg backdrop-blur-sm"
     >
       {isLoading ? 'Loading simulation config...' : 'Configure simulation'}
-    </button>
+    </Button>
   );
 }

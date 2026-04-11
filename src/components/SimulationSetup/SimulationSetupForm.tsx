@@ -1,11 +1,14 @@
-import { useState } from 'react';
 import * as Form from '@radix-ui/react-form';
+import { Play } from 'lucide-react';
+import { useState } from 'react';
 import * as z from 'zod';
-import { ConfigFormCard } from './ConfigFormCard';
-import { NumberField } from '../UI/NumberField';
-import { SliderField } from '../UI/SliderField';
-import type { WeightMetadata, InitEngineConfig } from '../../api/types';
 import { initializeSimulation } from '../../api/init';
+import type { InitEngineConfig, WeightMetadata } from '../../api/types';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Slider } from '../ui/slider';
+import { ConfigFormCard } from './ConfigFormCard';
 
 type SimulationSetupFormProps = {
   onClose: () => void;
@@ -73,6 +76,10 @@ const createInitialConfig = (
   seed: 42,
 });
 
+function formatSliderValue(value: number) {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+}
+
 export function SimulationSetupForm({
   onClose,
   weightMetadata,
@@ -111,60 +118,124 @@ export function SimulationSetupForm({
         }}
       >
         <div className="flex flex-col gap-5">
-          <NumberField
+          <Form.Field
             name="maximumEVs"
-            label="Number of EVs"
-            value={config.maximumEVs}
-            onChange={(value) =>
-              setConfig((prev) => ({
-                ...prev,
-                maximumEVs: value,
-              }))
-            }
-          />
+            className="grid grid-cols-1 gap-2 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6"
+          >
+            <Form.Label asChild>
+              <Label className="pt-2 text-base leading-snug font-semibold">
+                Number of EVs
+              </Label>
+            </Form.Label>
 
-          <NumberField
+            <Form.Control asChild>
+              <Input
+                type="number"
+                value={config.maximumEVs}
+                onChange={(event) =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    maximumEVs: Number(event.target.value),
+                  }))
+                }
+                className="h-12 w-full max-w-[280px] rounded-2xl border-border/80 bg-background/80 px-4 text-base"
+              />
+            </Form.Control>
+          </Form.Field>
+
+          <Form.Field
             name="seed"
-            label="Seed"
-            value={config.seed}
-            onChange={(value) =>
-              setConfig((prev) => ({
-                ...prev,
-                seed: value,
-              }))
-            }
-          />
+            className="grid grid-cols-1 gap-2 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6"
+          >
+            <Form.Label asChild>
+              <Label className="pt-2 text-base leading-snug font-semibold">
+                Seed
+              </Label>
+            </Form.Label>
 
-          <SliderField
+            <Form.Control asChild>
+              <Input
+                type="number"
+                value={config.seed}
+                onChange={(event) =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    seed: Number(event.target.value),
+                  }))
+                }
+                className="h-12 w-full max-w-[280px] rounded-2xl border-border/80 bg-background/80 px-4 text-base"
+              />
+            </Form.Control>
+          </Form.Field>
+
+          <Form.Field
             name="dualChargingProbability"
-            label="Probability of Dual Charger"
-            value={config.dualChargingProbability}
-            min={0}
-            max={1}
-            step={0.1}
-            onChange={(value) =>
-              setConfig((prev) => ({
-                ...prev,
-                dualChargingProbability: value,
-              }))
-            }
-          />
+            className="grid grid-cols-1 gap-2 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6"
+          >
+            <Form.Label asChild>
+              <Label className="pt-1 text-base leading-snug font-semibold">
+                Probability of Dual Charger
+              </Label>
+            </Form.Label>
 
-          <NumberField
+            <div className="w-full max-w-[420px]">
+              <div className="grid grid-cols-[32px_minmax(0,1fr)_44px_64px] items-center gap-3">
+                <span className="text-sm font-medium text-neutral-400">0</span>
+
+                <Slider
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={[config.dualChargingProbability]}
+                  onValueChange={(values) =>
+                    setConfig((prev) => ({
+                      ...prev,
+                      dualChargingProbability: values[0] ?? 0,
+                    }))
+                  }
+                  className="h-5"
+                  aria-label="Probability of Dual Charger"
+                />
+
+                <span className="text-right text-sm font-medium text-neutral-400">
+                  1
+                </span>
+
+                <div className="rounded-xl border border-border/80 bg-background/80 px-3 py-1.5 text-right text-sm font-semibold">
+                  {formatSliderValue(config.dualChargingProbability)}
+                </div>
+              </div>
+            </div>
+          </Form.Field>
+
+          <Form.Field
             name="numberOfChargers"
-            label="Number of Chargers"
-            value={config.numberOfChargers}
-            onChange={(value) =>
-              setConfig((prev) => ({
-                ...prev,
-                numberOfChargers: value,
-              }))
-            }
-          />
+            className="grid grid-cols-1 gap-2 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6"
+          >
+            <Form.Label asChild>
+              <Label className="pt-2 text-base leading-snug font-semibold">
+                Number of Chargers
+              </Label>
+            </Form.Label>
+
+            <Form.Control asChild>
+              <Input
+                type="number"
+                value={config.numberOfChargers}
+                onChange={(event) =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    numberOfChargers: Number(event.target.value),
+                  }))
+                }
+                className="h-12 w-full max-w-[280px] rounded-2xl border-border/80 bg-background/80 px-4 text-base"
+              />
+            </Form.Control>
+          </Form.Field>
         </div>
 
-        <div className="border-t border-neutral-800 pt-6">
-          <div className="mb-5 text-2xl font-semibold text-neutral-100">
+        <div className="border-t border-border/70 pt-6">
+          <div className="mb-5 text-2xl font-semibold">
             Weights
           </div>
 
@@ -175,25 +246,52 @@ export function SimulationSetupForm({
                   ?.value ?? weight.min;
 
               return (
-                <SliderField
+                <Form.Field
                   key={weight.id}
                   name={`weight-${weight.id}`}
-                  label={weight.name}
-                  value={value}
-                  min={weight.min}
-                  max={weight.max}
-                  step={0.1}
-                  onChange={(newValue) =>
-                    setConfig((prev) => ({
-                      ...prev,
-                      costWeights: prev.costWeights.map((item) =>
-                        item.costId === weight.id
-                          ? { ...item, value: newValue }
-                          : item
-                      ),
-                    }))
-                  }
-                />
+                  className="grid grid-cols-1 gap-2 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6"
+                >
+                  <Form.Label asChild>
+                    <Label className="pt-1 text-base leading-snug font-semibold">
+                      {weight.name}
+                    </Label>
+                  </Form.Label>
+
+                  <div className="w-full max-w-[420px]">
+                    <div className="grid grid-cols-[32px_minmax(0,1fr)_44px_64px] items-center gap-3">
+                      <span className="text-sm font-medium text-neutral-400">
+                        {weight.min}
+                      </span>
+
+                      <Slider
+                        min={weight.min}
+                        max={weight.max}
+                        step={0.1}
+                        value={[value]}
+                        onValueChange={(values) =>
+                          setConfig((prev) => ({
+                            ...prev,
+                            costWeights: prev.costWeights.map((item) =>
+                              item.costId === weight.id
+                                ? { ...item, value: values[0] ?? weight.min }
+                                : item
+                            ),
+                          }))
+                        }
+                        className="h-5"
+                        aria-label={weight.name}
+                      />
+
+                      <span className="text-right text-sm font-medium text-neutral-400">
+                        {weight.max}
+                      </span>
+
+                      <div className="rounded-xl border border-border/80 bg-background/80 px-3 py-1.5 text-right text-sm font-semibold">
+                        {formatSliderValue(value)}
+                      </div>
+                    </div>
+                  </div>
+                </Form.Field>
               );
             })}
           </div>
@@ -201,49 +299,25 @@ export function SimulationSetupForm({
 
         <div className="flex items-center justify-center gap-4 pt-2">
           <Form.Submit asChild>
-            <button
+            <Button
               type="submit"
-              className="
-                group
-                flex h-12 w-12 items-center justify-center
-                rounded-xl
-                border border-neutral-600
-                bg-neutral-800
-                text-white
-                shadow-md
-                transition
-                hover:scale-105 hover:bg-neutral-700
-              "
-              aria-label="Start simulation"
+              size="lg"
+              className="gap-2 rounded-xl"
             >
-              <svg
-                viewBox="0 0 15 15"
-                className="h-5 w-5 text-white transition group-hover:scale-110"
-              >
-                <path
-                  d="M3.24182 2.32181C3.3919 2.23132 3.5784 2.22601 3.73338 2.30781L12.7334 7.05781C12.8974 7.14436 13 7.31457 13 7.5C13 7.68543 12.8974 7.85564 12.7334 7.94219L3.73338 12.6922C3.5784 12.774 3.3919 12.7687 3.24182 12.6782C3.09175 12.5877 3 12.4252 3 12.25V2.75C3 2.57476 3.09175 2.4123 3.24182 2.32181ZM4 3.57925V11.4207L11.4288 7.5L4 3.57925Z"
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              <Play className="h-5 w-5 transition group-hover/button:scale-110" />
+              Start Simulation
+            </Button>
           </Form.Submit>
 
-          <button
+          <Button
             type="button"
             onClick={onClose}
-            className="
-              rounded-full
-              border border-neutral-600
-              bg-neutral-800
-              px-5 py-3
-              text-lg font-medium text-white
-              transition hover:bg-neutral-700
-            "
+            variant="outline"
+            size="lg"
+            className="rounded-full px-5 text-lg"
           >
             Close
-          </button>
+          </Button>
         </div>
       </Form.Root>
     </ConfigFormCard>
