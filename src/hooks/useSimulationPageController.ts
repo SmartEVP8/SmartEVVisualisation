@@ -63,7 +63,6 @@ export function useSimulationPageController() {
     panel: {
       isSidebarCollapsed: stationUiState.isSidebarCollapsed,
       isShowingRoutes: stationUiState.isShowingRoutes,
-      showRoutes: stationUiState.showRoutes,
       collapse: stationUiState.collapse,
       toggleSidebarCollapsed: stationUiState.toggleSidebarCollapsed,
     },

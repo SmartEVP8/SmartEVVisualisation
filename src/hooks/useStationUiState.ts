@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { ChargerState } from '../types/chargerState';
 import type { Charger, Station } from '../types/station';
 
@@ -26,20 +26,16 @@ export function useStationUiState({ chargerStates }: UseStationUiStateParams) {
     return map;
   }, [chargerStates]);
 
-  const selectStation = (station: Station, chargers: Charger[]) => {
+  const selectStation = useCallback((station: Station, chargers: Charger[]) => {
     setSelectedStation({ station, chargers });
     setIsSidebarCollapsed(false);
     setIsShowingRoutes(false);
-  };
+  }, []);
 
   const clearSelection = () => {
     setSelectedStation(null);
     setIsSidebarCollapsed(false);
     setIsShowingRoutes(false);
-  };
-
-  const showRoutes = () => {
-    setIsShowingRoutes(true);
   };
 
   const collapse = () => {
@@ -58,7 +54,6 @@ export function useStationUiState({ chargerStates }: UseStationUiStateParams) {
     chargerStatesByChargerId,
     selectStation,
     clearSelection,
-    showRoutes,
     collapse,
     toggleSidebarCollapsed,
   };

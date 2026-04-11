@@ -1,9 +1,8 @@
 import type { Map as LeafletMap } from 'leaflet';
 import { useMemo, useRef } from 'react';
-import { Polyline } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import { MapView } from '../components/map/MapView';
-import { StationMarker } from '../components/map/StationMarker';
+import { StationMarkers } from '../components/map/StationMarkers';
+import { Polyline } from 'react-leaflet';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
@@ -61,16 +60,16 @@ export function SimulationPage() {
     ] as MockIncomingRoute[];
   }, [selection.selectedStation]);
 
+
   const handleShowIncomingRoutes = () => {
-    const allRoutePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
+    const routePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
 
     panel.collapse();
-
-    if (allRoutePoints.length === 0) {
+    if (routePoints.length === 0) {
       return;
     }
 
-    mapRef.current?.fitBounds(allRoutePoints, {
+    mapRef.current?.fitBounds(routePoints, {
       padding: [40, 40],
       maxZoom: 14,
       animate: true,
@@ -94,27 +93,12 @@ export function SimulationPage() {
   return (
     <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
       <MapView mapRef={mapRef}>
-        {simulation.hasStarted && (
-          <MarkerClusterGroup
-            chunkedLoading
-            maxClusterRadius={35}
-            spiderfyOnMaxZoom
-            showCoverageOnHover={false}
-          >
-            {simulation.stations.map((station) => {
-              const stationChargers = simulation.chargersByStationId.get(station.id) ?? [];
-
-              return (
-                <StationMarker
-                  key={station.id}
-                  station={station}
-                  chargers={stationChargers}
-                  onSelect={selection.selectStation}
-                />
-              );
-            })}
-          </MarkerClusterGroup>
-        )}
+        <StationMarkers
+          hasStarted={simulation.hasStarted}
+          stations={simulation.stations}
+          chargersByStationId={simulation.chargersByStationId}
+          onSelect={selection.selectStation}
+        />
 
         {panel.isShowingRoutes && selection.selectedStation &&
           mockIncomingRoutes.map((route) => {
@@ -123,6 +107,7 @@ export function SimulationPage() {
             if (routePositions.length === 0) {
               return null;
             }
+
             return (
               <Polyline
                 key={`route-${route.evId}`}
