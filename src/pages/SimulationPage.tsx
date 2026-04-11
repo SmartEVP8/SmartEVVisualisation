@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import type { Map as LeafletMap } from 'leaflet';
+import { useMemo, useRef, useState } from 'react';
 import { Polyline } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { MapView } from '../components/map/MapView';
@@ -15,6 +16,7 @@ type MockIncomingRoute = { evId: number; waypoints: RoutePoint[] };
 
 export function SimulationPage() {
   const [showIncomingRoutes, setShowIncomingRoutes] = useState(false);
+  const mapRef = useRef<LeafletMap | null>(null);
 
   const {
     stations,
@@ -74,9 +76,26 @@ export function SimulationPage() {
     ] as MockIncomingRoute[];
   }, [selectedStation]);
 
+  const handleShowIncomingRoutes = () => {
+    const allRoutePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
+
+    setShowIncomingRoutes(true);
+
+    if (allRoutePoints.length === 0) {
+      return;
+    }
+
+    mapRef.current?.fitBounds(allRoutePoints, {
+      padding: [40, 40],
+      maxZoom: 14,
+      animate: true,
+      duration: 0.5,
+    });
+  };
+
   return (
     <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
-      <MapView>
+      <MapView mapRef={mapRef}>
         {hasSimulationStarted && (
           <MarkerClusterGroup
             chunkedLoading
@@ -180,7 +199,7 @@ export function SimulationPage() {
           selectedStation={selectedStation}
           chargerStatesByChargerId={chargerStatesByChargerId}
           onClose={closeStation}
-          onShowIncomingRoutes={() => setShowIncomingRoutes(true)}
+          onShowIncomingRoutes={handleShowIncomingRoutes}
         />
       )}
     </div>
