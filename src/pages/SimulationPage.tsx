@@ -1,5 +1,5 @@
 import type { Map as LeafletMap } from 'leaflet';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { Polyline } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { MapView } from '../components/map/MapView';
@@ -15,35 +15,21 @@ type RoutePoint = [number, number];
 type MockIncomingRoute = { evId: number; waypoints: RoutePoint[] };
 
 export function SimulationPage() {
-  const [showIncomingRoutes, setShowIncomingRoutes] = useState(false);
   const mapRef = useRef<LeafletMap | null>(null);
 
   const {
-    stations,
-    isSimulationStarting,
-    simulationError,
-    hasSimulationStarted,
-    isOpen,
-    isLoadingWeights,
-    weightsError,
-    weightMetadata,
-    initialCostWeights,
-    open,
-    close,
-    selectedStation,
-    chargerStatesByChargerId,
-    selectStation,
-    closeStation,
-    chargersByStationId,
-    handleStartSimulation,
+    simulation,
+    setup,
+    selection,
+    panel,
   } = useSimulationPageController();
 
   const mockIncomingRoutes = useMemo(() => {
-    if (!selectedStation) {
+    if (!selection.selectedStation) {
       return [] as MockIncomingRoute[];
     }
 
-    const { lat, lon } = selectedStation.station.pos;
+    const { lat, lon } = selection.selectedStation.station.pos;
 
     return [
       {
@@ -74,12 +60,12 @@ export function SimulationPage() {
         ],
       },
     ] as MockIncomingRoute[];
-  }, [selectedStation]);
+  }, [selection.selectedStation]);
 
   const handleShowIncomingRoutes = () => {
     const allRoutePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
 
-    setShowIncomingRoutes(true);
+    panel.showRoutes();
 
     if (allRoutePoints.length === 0) {
       return;
@@ -96,29 +82,29 @@ export function SimulationPage() {
   return (
     <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
       <MapView mapRef={mapRef}>
-        {hasSimulationStarted && (
+        {simulation.hasStarted && (
           <MarkerClusterGroup
             chunkedLoading
             maxClusterRadius={35}
             spiderfyOnMaxZoom
             showCoverageOnHover={false}
           >
-            {stations.map((station) => {
-              const stationChargers = chargersByStationId.get(station.id) ?? [];
+            {simulation.stations.map((station) => {
+              const stationChargers = simulation.chargersByStationId.get(station.id) ?? [];
 
               return (
                 <StationMarker
                   key={station.id}
                   station={station}
                   chargers={stationChargers}
-                  onSelect={selectStation}
+                  onSelect={selection.selectStation}
                 />
               );
             })}
           </MarkerClusterGroup>
         )}
 
-        {showIncomingRoutes && selectedStation &&
+        {panel.mode === 'routes' && selection.selectedStation &&
           mockIncomingRoutes.map((route) => {
             const routePositions = route.waypoints;
 
@@ -136,31 +122,31 @@ export function SimulationPage() {
       </MapView>
 
       <div className="absolute top-4 left-4 z-1000 w-70">
-        {!hasSimulationStarted && (
+        {!simulation.hasStarted && (
           <StartSimulationButton
-            onOpen={open}
-            disabled={isLoadingWeights || isSimulationStarting}
+            onOpen={setup.openModal}
+            disabled={setup.isLoadingWeights || simulation.isStarting}
           />
         )}
 
-        {weightsError && !isOpen && (
+        {setup.weightsError && !setup.isModalOpen && (
           <Alert variant="destructive" className="mt-3">
-            <AlertDescription>{weightsError}</AlertDescription>
+            <AlertDescription>{setup.weightsError}</AlertDescription>
           </Alert>
         )}
 
-        {simulationError && !isOpen && (
+        {simulation.error && !setup.isModalOpen && (
           <Alert variant="destructive" className="mt-3">
-            <AlertDescription>{simulationError}</AlertDescription>
+            <AlertDescription>{simulation.error}</AlertDescription>
           </Alert>
         )}
 
-        {hasSimulationStarted && selectedStation && showIncomingRoutes && (
+        {simulation.hasStarted && selection.selectedStation && panel.mode === 'routes' && (
           <div className="mt-3 rounded-2xl border border-border/70 bg-card/95 p-3 shadow-xl backdrop-blur-md">
             <div className="flex flex-col gap-2">
               <Button
                 type="button"
-                onClick={() => setShowIncomingRoutes(false)}
+                onClick={panel.showSidebar}
                 variant="default"
                 className="w-full"
               >
@@ -169,8 +155,7 @@ export function SimulationPage() {
               <Button
                 type="button"
                 onClick={() => {
-                  setShowIncomingRoutes(false);
-                  closeStation();
+                  selection.clearSelection();
                 }}
                 variant="secondary"
                 className="w-full"
@@ -183,22 +168,22 @@ export function SimulationPage() {
 
       </div>
 
-      {isOpen && (
+      {setup.isModalOpen && (
         <div className="absolute inset-0 z-1100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <SimulationSetupForm
-            onClose={close}
-            weightMetadata={weightMetadata}
-            initialCostWeights={initialCostWeights}
-            onStart={handleStartSimulation}
+            onClose={setup.closeModal}
+            weightMetadata={setup.weightMetadata}
+            initialCostWeights={setup.initialCostWeights}
+            onStart={simulation.start}
           />
         </div>
       )}
 
-      {hasSimulationStarted && selectedStation && !showIncomingRoutes && (
+      {simulation.hasStarted && selection.selectedStation && panel.mode === 'sidebar' && (
         <StationSidebar
-          selectedStation={selectedStation}
-          chargerStatesByChargerId={chargerStatesByChargerId}
-          onClose={closeStation}
+          selectedStation={selection.selectedStation}
+          chargerStatesByChargerId={simulation.chargerStatesByChargerId}
+          onClose={selection.clearSelection}
           onShowIncomingRoutes={handleShowIncomingRoutes}
         />
       )}
