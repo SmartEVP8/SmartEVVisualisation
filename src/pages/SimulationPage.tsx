@@ -1,29 +1,18 @@
-import { useMemo } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import type { InitEngineConfig } from '../api/types';
 import { MapView } from '../components/map/MapView';
 import { StationMarker } from '../components/map/StationMarker';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { useSimulationData } from '../hooks/useSimulationData';
-import { useSimulationSetupWeights } from '../hooks/useSimulationSetupWeights';
-import { useStationSelection } from '../hooks/useStationSelection';
-import type { Charger } from '../types/station';
+import { useSimulationPageController } from '../hooks/useSimulationPageController';
 
 export function SimulationPage() {
   const {
     stations,
-    chargers,
-    chargerStates,
     isSimulationStarting,
     simulationError,
     hasSimulationStarted,
-    startSimulation,
-  } = useSimulationData();
-
-  const {
     isOpen,
     isLoadingWeights,
     weightsError,
@@ -31,37 +20,13 @@ export function SimulationPage() {
     initialCostWeights,
     open,
     close,
-  } = useSimulationSetupWeights(isSimulationStarting);
-
-  const {
     selectedStation,
     chargerStatesByChargerId,
     selectStation,
     closeStation,
-    resetSelection,
-  } = useStationSelection({ chargerStates });
-
-  const chargersByStationId = useMemo(() => {
-    const map = new Map<number, Charger[]>();
-
-    for (const charger of chargers) {
-      const existing = map.get(charger.stationId) ?? [];
-      existing.push(charger);
-      map.set(charger.stationId, existing);
-    }
-
-    return map;
-  }, [chargers]);
-
-  const handleStartSimulation = async (config: InitEngineConfig) => {
-    try {
-      await startSimulation(config);
-      close();
-      resetSelection();
-    } catch (error) {
-      console.error('Failed to initialize simulation:', error);
-    }
-  };
+    chargersByStationId,
+    handleStartSimulation,
+  } = useSimulationPageController();
 
   return (
     <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
