@@ -3,11 +3,11 @@ export type ChargingProgressBarProps = {
   targetSoC: number;
 };
 
-export function ChargingProgressBar({ soc, targetSoC }: ChargingProgressBarProps) {
+export function TargetChargeDisplay({ soc, targetSoC }: ChargingProgressBarProps) {
   return (
     <>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-xs text-muted-foreground">Charging Progress</span>
+        <span className="text-xs text-muted-foreground">Desired Charge</span>
         <span className="text-lg font-bold">
           {Math.round(soc * 100)}% → {Math.round(targetSoC * 100)}%
         </span>

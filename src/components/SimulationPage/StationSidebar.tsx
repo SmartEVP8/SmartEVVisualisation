@@ -9,7 +9,7 @@ import { ButtonGroup } from '../ui/button-group';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Separator } from '../ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { ChargingProgressBar } from './ChargingProgressBar';
+import { TargetChargeDisplay } from './TargetChargeDisplay';
 
 type StationSidebarProps = {
   selectedStation: {
@@ -313,12 +313,12 @@ type QueueItemProps = {
 
 function QueueItem({ ev }: QueueItemProps) {
   return (
-    <Card size="sm" variant="muted" className="p-4">
-      <CardHeader className="px-0 py-0 pb-2">
+    <Card size="sm" variant="muted" className='gap-0'>
+      <CardHeader className="px-0 mb-0 py-0 pb-2">
         <p className="text-sm font-bold">Vehicle {ev.evID}</p>
       </CardHeader>
-      <CardContent className="px-0 py-0">
-        <ChargingProgressBar soc={ev.SoC} targetSoC={ev.targetSoC} />
+      <CardContent className="px-0 mt-0 py-0">
+        <TargetChargeDisplay soc={ev.SoC} targetSoC={ev.targetSoC} />
       </CardContent>
     </Card>
   );
