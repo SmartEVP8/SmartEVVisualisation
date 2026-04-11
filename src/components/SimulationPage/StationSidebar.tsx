@@ -241,6 +241,11 @@ type ChargerCardProps = {
 };
 
 function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCardProps) {
+  const cardClass = [
+    "relative cursor-pointer p-4 text-left transition-all duration-200",
+    !isSelected && "hover:bg-muted/50 hover:border-border/70",
+  ].filter(Boolean).join(" ");
+
   return (
     <div
       role="button"
@@ -257,13 +262,10 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
       <Card
         size="sm"
         variant="muted"
-        className={`cursor-pointer p-4 text-left transition-all duration-200 ${
-          isSelected
-            ? 'border-primary/50 bg-primary/10 shadow-md'
-            : 'hover:bg-muted/50 hover:border-border/70'
-        }`}
+        selected={isSelected}
+        className={cardClass}
       >
-        <CardHeader className="px-0 py-0 pb-2">
+        <CardHeader className="px-0 py-0 pb-2 relative z-20">
           <div className="flex items-center justify-between gap-2">
             <h3 className="min-w-0 flex-1 truncate text-sm font-bold">Charger {charger.id}</h3>
             <div className="flex shrink-0 items-center gap-1">
@@ -286,7 +288,7 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
           </div>
         </CardHeader>
 
-        <CardContent className="px-0 py-0">
+        <CardContent className="px-0 py-0 relative z-20">
           <div className="space-y-2.5 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Max Energy</span>

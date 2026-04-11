@@ -1,15 +1,40 @@
-import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import * as React from "react"
+
+import { cva } from "class-variance-authority"
+
+const cardVariants = cva(
+  "group/card flex flex-col gap-6 overflow-hidden rounded-4xl py-6 text-sm text-card-foreground shadow-md ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-4xl *:[img:last-child]:rounded-b-4xl",
+  {
+    variants: {
+      variant: {
+        default: "bg-card",
+        muted: "rounded-2xl border border-border/50 bg-muted/90 shadow-none ring-0 dark:ring-foreground/10",
+      },
+      size: {
+        default: "",
+        sm: "gap-4 py-4",
+        xs: "gap-2 py-2",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
 function Card({
   className,
   size = "default",
   variant = "default",
+  selected = false,
   ...props
 }: React.ComponentProps<"div"> & {
   size?: "default" | "sm" | "xs"
   variant?: "default" | "muted"
+  selected?: boolean
 }) {
   return (
     <div
@@ -17,8 +42,8 @@ function Card({
       data-size={size}
       data-variant={variant}
       className={cn(
-        "group/card flex flex-col gap-6 overflow-hidden rounded-4xl bg-card py-6 text-sm text-card-foreground shadow-md ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 data-[size=sm]:gap-4 data-[size=sm]:py-4 data-[variant=muted]:rounded-2xl data-[variant=muted]:border data-[variant=muted]:border-border/50 data-[variant=muted]:bg-muted/90 data-[variant=muted]:shadow-none data-[variant=muted]:ring-0 dark:ring-foreground/10 *:[img:first-child]:rounded-t-4xl *:[img:last-child]:rounded-b-4xl",
-        "group/card flex flex-col gap-6 overflow-hidden rounded-4xl bg-card py-6 text-sm text-card-foreground shadow-md ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 data-[size=sm]:gap-4 data-[size=sm]:py-4 data-[size=xs]:gap-2 data-[size=xs]:py-2 data-[variant=muted]:rounded-2xl data-[variant=muted]:border data-[variant=muted]:border-border/50 data-[variant=muted]:bg-muted/30 data-[variant=muted]:shadow-none data-[variant=muted]:ring-0 dark:ring-foreground/10 *:[img:first-child]:rounded-t-4xl *:[img:last-child]:rounded-b-4xl",
+        cardVariants({ variant, size }),
+        selected && "border-primary/50 shadow-md bg-primary/10",
         className
       )}
       {...props}
