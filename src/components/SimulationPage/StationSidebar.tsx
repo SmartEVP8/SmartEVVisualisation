@@ -20,6 +20,8 @@ type StationSidebarProps = {
   onClose: () => void;
   onShowIncomingRoutes: () => void;
   onFocusStation: () => void;
+  isCollapsed: boolean;
+  onToggleCollapsed: () => void;
 };
 
 export function StationSidebar({
@@ -28,8 +30,9 @@ export function StationSidebar({
   onClose,
   onShowIncomingRoutes,
   onFocusStation,
+  isCollapsed,
+  onToggleCollapsed,
 }: StationSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selectedChargerSelection, setSelectedChargerSelection] = useState<{
     stationId: number;
     chargerId: number;
@@ -43,7 +46,6 @@ export function StationSidebar({
   const sidebarWidthClass = selectedChargerId === null ? 'w-[26rem]' : 'w-[40rem]';
 
   const handleClose = () => {
-    setIsCollapsed(false);
     setSelectedChargerSelection(null);
     onClose();
   };
@@ -84,7 +86,7 @@ export function StationSidebar({
       <StationSidebarHeader
         title={selectedStation.station.address}
         isCollapsed={isCollapsed}
-        onToggleCollapsed={() => setIsCollapsed((current) => !current)}
+        onToggleCollapsed={onToggleCollapsed}
         onFocusStation={onFocusStation}
         onShowIncomingRoutes={onShowIncomingRoutes}
         onClose={handleClose}

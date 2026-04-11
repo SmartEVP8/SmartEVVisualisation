@@ -7,15 +7,14 @@ type SelectedStation = {
   chargers: Charger[];
 } | null;
 
-type PanelMode = 'sidebar' | 'routes';
-
 type UseStationUiStateParams = {
   chargerStates: ChargerState[];
 };
 
 export function useStationUiState({ chargerStates }: UseStationUiStateParams) {
   const [selectedStation, setSelectedStation] = useState<SelectedStation>(null);
-  const [panelMode, setPanelMode] = useState<PanelMode>('sidebar');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isShowingRoutes, setIsShowingRoutes] = useState(false);
 
   const chargerStatesByChargerId = useMemo(() => {
     const map = new Map<number, ChargerState>();
@@ -29,29 +28,38 @@ export function useStationUiState({ chargerStates }: UseStationUiStateParams) {
 
   const selectStation = (station: Station, chargers: Charger[]) => {
     setSelectedStation({ station, chargers });
-    setPanelMode('sidebar');
+    setIsSidebarCollapsed(false);
+    setIsShowingRoutes(false);
   };
 
   const clearSelection = () => {
     setSelectedStation(null);
-    setPanelMode('sidebar');
+    setIsSidebarCollapsed(false);
+    setIsShowingRoutes(false);
   };
 
   const showRoutes = () => {
-    setPanelMode('routes');
+    setIsShowingRoutes(true);
   };
 
-  const showSidebar = () => {
-    setPanelMode('sidebar');
+  const collapse = () => {
+    setIsSidebarCollapsed(true);
+    setIsShowingRoutes(true);
+  };
+
+  const toggleSidebarCollapsed = () => {
+    setIsSidebarCollapsed((current) => !current);
   };
 
   return {
     selectedStation,
-    panelMode,
+    isSidebarCollapsed,
+    isShowingRoutes,
     chargerStatesByChargerId,
     selectStation,
     clearSelection,
     showRoutes,
-    showSidebar,
+    collapse,
+    toggleSidebarCollapsed,
   };
 }

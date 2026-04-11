@@ -8,7 +8,6 @@ import { StationSidebar } from '../components/SimulationPage/StationSidebar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Button } from '../components/ui/button';
 import { useSimulationPageController } from '../hooks/useSimulationPageController';
 
 type RoutePoint = [number, number];
@@ -65,7 +64,7 @@ export function SimulationPage() {
   const handleShowIncomingRoutes = () => {
     const allRoutePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
 
-    panel.showRoutes();
+    panel.collapse();
 
     if (allRoutePoints.length === 0) {
       return;
@@ -117,7 +116,7 @@ export function SimulationPage() {
           </MarkerClusterGroup>
         )}
 
-        {panel.mode === 'routes' && selection.selectedStation &&
+        {panel.isShowingRoutes && selection.selectedStation &&
           mockIncomingRoutes.map((route) => {
             const routePositions = route.waypoints;
 
@@ -154,30 +153,7 @@ export function SimulationPage() {
           </Alert>
         )}
 
-        {simulation.hasStarted && selection.selectedStation && panel.mode === 'routes' && (
-          <div className="mt-3 rounded-2xl border border-border/70 bg-card/95 p-3 shadow-xl backdrop-blur-md">
-            <div className="flex flex-col gap-2">
-              <Button
-                type="button"
-                onClick={panel.showSidebar}
-                variant="default"
-                className="w-full"
-              >
-                Show sidebar again
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  selection.clearSelection();
-                }}
-                variant="secondary"
-                className="w-full"
-              >
-                Close routes
-              </Button>
-            </div>
-          </div>
-        )}
+  
 
       </div>
 
@@ -192,13 +168,15 @@ export function SimulationPage() {
         </div>
       )}
 
-      {simulation.hasStarted && selection.selectedStation && panel.mode === 'sidebar' && (
+      {simulation.hasStarted && selection.selectedStation && (
         <StationSidebar
           selectedStation={selection.selectedStation}
           chargerStatesByChargerId={simulation.chargerStatesByChargerId}
           onClose={selection.clearSelection}
           onShowIncomingRoutes={handleShowIncomingRoutes}
           onFocusStation={handleFocusStation}
+          isCollapsed={panel.isSidebarCollapsed}
+          onToggleCollapsed={panel.toggleSidebarCollapsed}
         />
       )}
     </div>

@@ -61,9 +61,11 @@ export function useSimulationPageController() {
       clearSelection: stationUiState.clearSelection,
     },
     panel: {
-      mode: stationUiState.panelMode,
+      isSidebarCollapsed: stationUiState.isSidebarCollapsed,
+      isShowingRoutes: stationUiState.isShowingRoutes,
       showRoutes: stationUiState.showRoutes,
-      showSidebar: stationUiState.showSidebar,
+      collapse: stationUiState.collapse,
+      toggleSidebarCollapsed: stationUiState.toggleSidebarCollapsed,
     },
   };
 }
