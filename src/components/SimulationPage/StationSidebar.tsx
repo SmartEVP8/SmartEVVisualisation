@@ -1,20 +1,25 @@
-import { Battery, ChevronLeft, ChevronRight, Plug, Road } from 'lucide-react';
+import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X } from 'lucide-react';
 import { useState } from 'react';
 import type { ChargerState } from '../../types/chargerState';
 import { fakeEVChargerStates } from '../../types/chargerState';
 import type { Charger, Station } from '../../types/station';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { ButtonGroup } from '../ui/button-group';
 import { Card, CardContent, CardHeader } from '../ui/card';
+import { Separator } from '../ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { ChargingProgressBar } from './ChargingProgressBar';
 
 type StationSidebarProps = {
   selectedStation: {
     station: Station;
     chargers: Charger[];
-  } | null;
+  };
   chargerStatesByChargerId: Map<number, ChargerState>;
   onClose: () => void;
   onShowIncomingRoutes: () => void;
+  onFocusStation: () => void;
 };
 
 export function StationSidebar({
@@ -22,8 +27,8 @@ export function StationSidebar({
   chargerStatesByChargerId,
   onClose,
   onShowIncomingRoutes,
+  onFocusStation,
 }: StationSidebarProps) {
-  const isOpen = selectedStation !== null;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selectedChargerSelection, setSelectedChargerSelection] = useState<{
     stationId: number;
@@ -31,7 +36,7 @@ export function StationSidebar({
   } | null>(null);
 
   const selectedChargerId =
-    selectedStation && selectedChargerSelection?.stationId === selectedStation.station.id
+    selectedChargerSelection?.stationId === selectedStation.station.id
       ? selectedChargerSelection.chargerId
       : null;
 
@@ -43,15 +48,12 @@ export function StationSidebar({
     onClose();
   };
 
-  const handleSelectCharger = (chargerId: number) => {
-    if (!selectedStation) {
-      return;
-    }
-
-    if (
+  const toggleChargerSelection = (chargerId: number) => {
+    const isSameChargerSelected =
       selectedChargerSelection?.stationId === selectedStation.station.id &&
-      selectedChargerSelection.chargerId === chargerId
-    ) {
+      selectedChargerSelection.chargerId === chargerId;
+
+    if (isSameChargerSelected) {
       setSelectedChargerSelection(null);
       return;
     }
@@ -62,50 +64,223 @@ export function StationSidebar({
     });
   };
 
-  // Stats helpers
-  const getActiveChargerCount = () => {
-    return selectedStation?.chargers.filter(c => chargerStatesByChargerId.get(c.id)?.isActive).length ?? 0;
-  };
+  const selectedChargerState = selectedChargerId !== null
+    ? chargerStatesByChargerId.get(selectedChargerId)
+    : null;
 
-  const getTotalQueueSize = () => {
-    return selectedStation?.chargers.reduce((sum, c) => sum + (chargerStatesByChargerId.get(c.id)?.queueSize ?? 0), 0) ?? 0;
-  };
+  const selectedQueueItems = selectedChargerState?.evsInQueue && selectedChargerState.evsInQueue.length > 0
+    ? selectedChargerState.evsInQueue
+    : fakeEVChargerStates;
 
-  const getDualChargerCount = () => {
-    return selectedStation?.chargers.filter(c => c.isDual).length ?? 0;
-  };
+  return (
+    <Card
+      className={`
+        absolute top-6 right-6 bottom-6 z-400
+        flex ${sidebarWidthClass} flex-col overflow-hidden
+        transition-all duration-200
+        ${isCollapsed ? 'translate-x-[calc(100%-4.25rem)] opacity-100' : 'translate-x-0 opacity-100'}
+      `}
+    >
+      <StationSidebarHeader
+        title={selectedStation.station.address}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={() => setIsCollapsed((current) => !current)}
+        onFocusStation={onFocusStation}
+        onShowIncomingRoutes={onShowIncomingRoutes}
+        onClose={handleClose}
+      />
 
-  // Render helpers
-  const renderChargerCard = (charger: Charger) => {
-    const chargerState = chargerStatesByChargerId.get(charger.id) ?? null;
-    const isSelected = selectedChargerId === charger.id;
+      <StationStats
+        chargers={selectedStation.chargers}
+        chargerStatesByChargerId={chargerStatesByChargerId}
+      />
 
-    return (
+      <div
+        className={`flex flex-1 flex-col gap-4 overflow-hidden p-5 transition-opacity duration-200 ${
+          isCollapsed ? 'pointer-events-none opacity-20' : 'opacity-100'
+        }`}
+      >
+        <div className="flex flex-1 gap-4 overflow-hidden">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Chargers
+            </p>
+            <p className="mb-3 text-xs text-muted-foreground/80">
+              Click a charger card to view queue details.
+            </p>
+            <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
+              {selectedStation.chargers.map((charger) => {
+                const chargerState = chargerStatesByChargerId.get(charger.id) ?? null;
+
+                return (
+                  <ChargerCard
+                    key={charger.id}
+                    charger={charger}
+                    chargerState={chargerState}
+                    isSelected={selectedChargerId === charger.id}
+                    onSelect={toggleChargerSelection}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <Separator orientation="vertical" className="bg-border/30" />
+          {selectedChargerId !== null && (
+            <QueueSection
+              queueItems={selectedQueueItems}
+              onClear={() => setSelectedChargerSelection(null)}
+            />
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+
+}
+
+type StationSidebarHeaderProps = {
+  title: string;
+  isCollapsed: boolean;
+  onToggleCollapsed: () => void;
+  onFocusStation: () => void;
+  onShowIncomingRoutes: () => void;
+  onClose: () => void;
+};
+
+function StationSidebarHeader({
+  title,
+  isCollapsed,
+  onToggleCollapsed,
+  onFocusStation,
+  onShowIncomingRoutes,
+  onClose,
+}: StationSidebarHeaderProps) {
+  return (
+    <>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-4 p-6 pb-4">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
+              onClick={onToggleCollapsed}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="-mt-1 h-10 w-10 shrink-0 rounded-full"
+            >
+              {isCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}</TooltipContent>
+        </Tooltip>
+
+        <h2 className="col-span-2 row-start-2 min-w-0 truncate text-2xl leading-tight font-semibold">{title}</h2>
+
+        <ButtonGroup className="col-start-2 row-start-1 justify-self-end shrink-0 [&>[data-slot=button]:h-10 [&>[data-slot=button]:w-10 [&>[data-slot=button]:rounded-full]">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="secondary"
+                onClick={onFocusStation}
+                className="h-10 w-10 rounded-full"
+                aria-label="Focus selected station"
+              >
+                <Crosshair className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Focus station</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="default"
+                onClick={onShowIncomingRoutes}
+                className="h-10 w-10 rounded-full"
+                aria-label="Show incoming EVs"
+              >
+                <Road className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Show incoming EVs</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={onClose}
+                type="button"
+                size="icon"
+                variant="outline"
+                className="h-10 w-10 rounded-full"
+                aria-label="Close sidebar"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Close sidebar</TooltipContent>
+          </Tooltip>
+        </ButtonGroup>
+      </div>
+      <Separator />
+    </>
+  );
+}
+
+type ChargerCardProps = {
+  charger: Charger;
+  chargerState: ChargerState | null;
+  isSelected: boolean;
+  onSelect: (chargerId: number) => void;
+};
+
+function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCardProps) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
+      onClick={() => onSelect(charger.id)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect(charger.id);
+        }
+      }}
+    >
       <Card
-        key={charger.id}
         size="sm"
-        onClick={() => handleSelectCharger(charger.id)}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isSelected}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleSelectCharger(charger.id);
-          }
-        }}
-        className={`cursor-pointer rounded-2xl border text-left transition-all duration-200 p-4 ${
+        variant="muted"
+        className={`cursor-pointer p-4 text-left transition-all duration-200 ${
           isSelected
             ? 'border-primary/50 bg-primary/10 shadow-md'
-            : 'border-border/50 bg-muted/30 hover:bg-muted/50 hover:border-border/70'
+            : 'hover:bg-muted/50 hover:border-border/70'
         }`}
       >
         <CardHeader className="px-0 py-0 pb-2">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-bold">Charger {charger.id}</h3>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
-              {chargerState?.isActive ? 'Active' : 'Free'}
-            </span>
+            <h3 className="min-w-0 flex-1 truncate text-sm font-bold">Charger {charger.id}</h3>
+            <div className="flex shrink-0 items-center gap-1">
+              {charger.isDual ? (
+                <Badge variant="default">
+                  <Battery className="h-4 w-4" />
+                  Dual
+                </Badge>
+              ) : (
+                <Badge variant="default">
+                  <Plug className="h-4 w-4" />
+                  Single
+                </Badge>
+              )}
+              <Badge variant="secondary">
+                {chargerState?.isActive ? <BatteryCharging className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                {chargerState?.isActive ? 'Active' : 'Free'}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
 
@@ -121,212 +296,116 @@ export function StationSidebar({
               <span className="font-medium">{chargerState?.queueSize ?? 0}</span>
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Type</span>
-              <div className="flex items-center gap-1">
-                {charger.isDual ? (
-                  <>
-                    <Battery className="h-4 w-4 text-emerald-400" />
-                    <span className="text-sm font-semibold text-emerald-400">Dual</span>
-                  </>
-                ) : (
-                  <>
-                    <Plug className="h-4 w-4 text-slate-400" />
-                    <span className="text-sm font-semibold text-slate-400">Single</span>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
-    );
-  };
+    </div>
+  );
+}
 
-  const renderQueueItem = (ev: ChargerState['evsInQueue'][0]) => (
-    <Card
-      key={ev.evID}
-      size="sm"
-      className="rounded-2xl border-border/50 bg-muted/30 p-4"
-    >
+type QueueItemProps = {
+  ev: ChargerState['evsInQueue'][0];
+};
+
+function QueueItem({ ev }: QueueItemProps) {
+  return (
+    <Card size="sm" variant="muted" className="p-4">
       <CardHeader className="px-0 py-0 pb-2">
         <p className="text-sm font-bold">Vehicle {ev.evID}</p>
       </CardHeader>
       <CardContent className="px-0 py-0">
-        <div className="space-y-3">
-          <div>
-            <div className="mb-2 flex items-baseline justify-between">
-              <span className="text-xs text-muted-foreground">Charging Progress</span>
-              <span className="text-lg font-bold">{Math.round(ev.SoC * 100)}% → {Math.round(ev.targetSoC * 100)}%</span>
-            </div>
-            <div className="relative h-4 rounded-full bg-muted overflow-hidden">
-              {/* Target SoC background layer */}
-              <div
-                className="absolute h-full bg-blue-500/30"
-                style={{ width: `${ev.targetSoC * 100}%` }}
-              />
-              {/* Current SoC foreground layer */}
-              <div
-                className="absolute h-full bg-blue-500"
-                style={{ width: `${ev.SoC * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
+        <ChargingProgressBar soc={ev.SoC} targetSoC={ev.targetSoC} />
       </CardContent>
     </Card>
   );
+}
 
+type QueueSectionProps = {
+  queueItems: ChargerState['evsInQueue'];
+  onClear: () => void;
+};
+
+function QueueSection({ queueItems, onClear }: QueueSectionProps) {
   return (
-    <Card
-      className={`
-        absolute top-6 right-6 bottom-6 z-400
-        flex ${sidebarWidthClass} max-w-[calc(100vw-3rem)] flex-col overflow-hidden
-        rounded-[2.5rem_2.5rem_0_2.5rem]
-        border-border/80 bg-card/95 shadow-2xl backdrop-blur-md
-        transition-all duration-300
-        ${
-          isOpen
-            ? isCollapsed
-              ? 'translate-x-[calc(100%-4.25rem)] opacity-100'
-              : 'translate-x-0 opacity-100'
-            : 'translate-x-[110%] pointer-events-none opacity-0'
-        }
-      `}
-    >
-      <div className="flex items-start justify-between gap-4 border-b border-border/70 p-6 pb-4">
-        <div className="flex min-w-0 items-start gap-3">
+    <div className="flex min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col pl-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Queue for Charger
+          </p>
           <Button
             type="button"
-            size="icon"
-            variant="secondary"
-            onClick={() => setIsCollapsed((current) => !current)}
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="relative z-30 h-10 w-10 shrink-0 rounded-full"
+            variant="ghost"
+            size="sm"
+            onClick={onClear}
+            className="h-7 px-2 text-xs"
           >
-            {isCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
-
-          <h2 className="text-2xl leading-tight font-semibold wrap-break-word">
-            {selectedStation?.station.address ?? 'Station'}
-          </h2>
-        </div>
-
-        <div className="flex items-center gap-2">
-       
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={onShowIncomingRoutes}
-                  className="h-10 w-10 rounded-full"
-                  aria-label="Show incoming EVs"
-                >
-                  <Road className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Show incoming EVs</TooltipContent>
-            </Tooltip>
-       
-
-          <Button
-            onClick={handleClose}
-            type="button"
-            size="icon"
-            variant="outline"
-            className="h-10 w-10 rounded-full text-xl"
-          >
-            ×
+            Clear
           </Button>
         </div>
-      </div>
 
-      {selectedStation?.chargers.length ? (
-        <div className="border-b border-border/50 px-5 py-4">
-          <div
-            className={`grid gap-2 text-center text-xs ${
-              selectedChargerId === null ? 'grid-cols-2' : 'grid-cols-4'
-            }`}
-          >
-            <div className="rounded-lg bg-muted/30 p-2">
-              <p className="text-muted-foreground text-[10px] font-semibold uppercase">Chargers</p>
-              <p className="text-base font-bold">{selectedStation.chargers.length}</p>
-            </div>
-            <div className="rounded-lg bg-muted/30 p-2">
-              <p className="text-muted-foreground text-[10px] font-semibold uppercase">Active</p>
-              <p className="text-base font-bold">{getActiveChargerCount()}</p>
-            </div>
-            <div className="rounded-lg bg-muted/30 p-2">
-              <p className="text-muted-foreground text-[10px] font-semibold uppercase">Queue</p>
-              <p className="text-base font-bold">{getTotalQueueSize()}</p>
-            </div>
-            <div className="rounded-lg bg-muted/30 p-2">
-              <p className="text-muted-foreground text-[10px] font-semibold uppercase">Dual</p>
-              <p className="text-base font-bold">{getDualChargerCount()}</p>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      <div
-        className={`flex flex-1 flex-col gap-4 overflow-hidden p-5 transition-opacity duration-200 ${
-          isCollapsed ? 'pointer-events-none opacity-20' : 'opacity-100'
-        }`}
-      >
-        {selectedStation?.chargers.length ? (
-          <div className="flex flex-1 gap-4 overflow-hidden">
-            <div className="flex min-w-0 flex-1 flex-col">
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Chargers
-              </p>
-              <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
-                {selectedStation.chargers.map(renderChargerCard)}
-              </div>
-            </div>
-
-            {selectedChargerId !== null && (
-              <div className="flex min-w-0 flex-1 flex-col border-l border-border/30 pl-4">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Queue for Charger {selectedChargerId}
-                  </p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedChargerSelection(null)}
-                    className="h-7 px-2 text-xs"
-                  >
-                    Clear
-                  </Button>
-                </div>
-
-                {(() => {
-                  const selectedChargerState = chargerStatesByChargerId.get(selectedChargerId);
-                  const queueItems = selectedChargerState?.evsInQueue && selectedChargerState.evsInQueue.length > 0
-                    ? selectedChargerState.evsInQueue
-                    : fakeEVChargerStates;
-
-                  return queueItems.length > 0 ? (
-                    <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
-                      {queueItems.map(renderQueueItem)}
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-border/50 bg-muted/30 p-4">
-                      <p className="text-xs text-muted-foreground">No vehicles waiting</p>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
+        {queueItems.length > 0 ? (
+          <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
+            {queueItems.map((ev) => (
+              <QueueItem key={ev.evID} ev={ev} />
+            ))}
           </div>
         ) : (
-          <Card className="rounded-2xl border-border/50 bg-muted/30 p-4">
-            <p className="text-sm text-muted-foreground">No chargers found for this station.</p>
+          <Card variant="muted" className="p-4">
+            <p className="text-xs text-muted-foreground">No vehicles waiting</p>
           </Card>
         )}
       </div>
-    </Card>
+    </div>
   );
 }
+
+type StationStatsProps = {
+  chargers: Charger[];
+  chargerStatesByChargerId: Map<number, ChargerState>;
+};
+
+function StationStats({
+  chargers,
+  chargerStatesByChargerId,
+}: StationStatsProps) {
+  const activeCount = chargers.filter((charger) =>
+    chargerStatesByChargerId.get(charger.id)?.isActive
+  ).length;
+
+  const queueCount = chargers.reduce(
+    (sum, charger) => sum + (chargerStatesByChargerId.get(charger.id)?.queueSize ?? 0),
+    0
+  );
+
+  const dualCount = chargers.filter((charger) => charger.isDual).length;
+
+  return (
+    <>
+      <div className="px-5 py-4">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-3 text-center text-xs">
+          <Card variant="muted" size="xs" className="p-2">
+            <p className="text-muted-foreground text-sm font-semibold uppercase">Chargers</p>
+            <p className="text-lg font-bold">{chargers.length}</p>
+          </Card>
+          <Card variant="muted" size="xs" className="p-2">
+            <p className="text-muted-foreground text-sm font-semibold uppercase">Active</p>
+            <p className="text-lg font-bold">{activeCount}</p>
+          </Card>
+          <Card variant="muted" size="xs" className="p-2">
+            <p className="text-muted-foreground text-sm font-semibold uppercase">Queue</p>
+            <p className="text-lg font-bold">{queueCount}</p>
+          </Card>
+          <Card variant="muted" size="xs" className="p-2">
+            <p className="text-muted-foreground text-sm font-semibold uppercase">Dual</p>
+            <p className="text-lg font-bold">{dualCount}</p>
+          </Card>
+        </div>
+      </div>
+      <Separator />
+    </>
+  );
+}
+
+
+

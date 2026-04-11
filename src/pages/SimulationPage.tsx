@@ -79,6 +79,19 @@ export function SimulationPage() {
     });
   };
 
+  const handleFocusStation = () => {
+    if (!selection.selectedStation) {
+      return;
+    }
+
+    const { lat, lon } = selection.selectedStation.station.pos;
+
+    mapRef.current?.flyTo([lat, lon], 18, {
+      animate: true,
+      duration: 0.7,
+    });
+  };
+
   return (
     <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
       <MapView mapRef={mapRef}>
@@ -185,6 +198,7 @@ export function SimulationPage() {
           chargerStatesByChargerId={simulation.chargerStatesByChargerId}
           onClose={selection.clearSelection}
           onShowIncomingRoutes={handleShowIncomingRoutes}
+          onFocusStation={handleFocusStation}
         />
       )}
     </div>
