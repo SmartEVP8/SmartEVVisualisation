@@ -1,7 +1,6 @@
 import { dispatchWSEventAction, simulationStore } from "@/store/simulationStore.ts";
-import { EnvelopeSchema, type Envelope } from "../generated/api_pb.ts";
-import { GetStationSnapshotSchema } from "../generated/api_pb.ts";
 import { fromBinary, toBinary, create } from "@bufbuild/protobuf";
+import { EnvelopeSchema, GetStationSnapshotSchema, type Envelope } from "./generated/api_pb";
 
 // TODO : BASEURL SHOULD PROBABLY BE GLOBAL
 const WS_URL = "ws://localhost:5000/ws/simulation";
@@ -64,3 +63,4 @@ export function closeSimulationWS() {
   ws?.close();
   ws = null;
 }
+

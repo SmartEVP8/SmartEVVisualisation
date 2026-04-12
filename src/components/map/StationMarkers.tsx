@@ -5,7 +5,6 @@ import type { Charger, Station } from '../../types/station';
 import { StationMarker } from './StationMarker';
 
 type Props = {
-  hasStarted: boolean;
   stations: Station[];
   chargersByStationId: Map<number, Charger[]>;
   onSelect: (station: Station, chargers: Charger[]) => void;
@@ -13,7 +12,6 @@ type Props = {
 
 
 function StationMarkersComponent({
-  hasStarted,
   stations,
   chargersByStationId,
   onSelect,
@@ -37,10 +35,6 @@ function StationMarkersComponent({
       bounds.contains([station.pos.lat, station.pos.lon])
     );
   }, [stations, bounds]);
-
-  if (!hasStarted) {
-    return null;
-  }
 
   return (
     <MarkerClusterGroup
