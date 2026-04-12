@@ -1,7 +1,12 @@
+import { TooltipProvider } from './components/ui/tooltip';
 import { SimulationPage } from './pages/SimulationPage';
 
 function App() {
-  return <SimulationPage />;
+  return (
+    <TooltipProvider>
+      <SimulationPage />
+    </TooltipProvider>
+  );
 }
 
 export default App;

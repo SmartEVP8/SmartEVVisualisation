@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 type ConfigFormCardProps = {
   title: string;
@@ -12,26 +13,12 @@ export function ConfigFormCard({
   className = '',
 }: ConfigFormCardProps) {
   return (
-    <section
-      className={`
-        w-full max-w-lg
-        mx-auto
-        rounded-[2rem]
-        border border-neutral-700
-        bg-neutral-900
-        shadow-2xl
-        ${className}
-      `}
-    >
-      <div className="px-6 pt-5 pb-2">
-        <h2 className="text-center text-xl font-semibold text-white">
-          {title}
-        </h2>
-      </div>
+    <Card className={`mx-auto w-full max-w-lg rounded-[2rem] border-border/70 bg-card/95 shadow-2xl ${className}`}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-center text-xl">{title}</CardTitle>
+      </CardHeader>
 
-      <div className="px-6 pb-6 pt-2">
-        {children}
-      </div>
-    </section>
+      <CardContent className="pt-2">{children}</CardContent>
+    </Card>
   );
 }
