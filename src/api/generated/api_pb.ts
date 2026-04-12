@@ -10,9 +10,11 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file api.proto.
  */
 export const file_api: GenFile = /*@__PURE__*/
-  fileDesc("CglhcGkucHJvdG8SCHByb3RvY29sIiQKCFBvc2l0aW9uEgsKA2xhdBgBIAEoARILCgNsb24YAiABKAEiLwoKQ29zdFdlaWdodBIKCgJpZBgBIAEoBRIVCg11cGRhdGVkX3ZhbHVlGAIgASgCIkoKDFdlaWdodFJhbmdlcxIKCgJpZBgBIAEoBRIPCgdtaW5pbXVtGAIgASgCEg8KB21heGltdW0YAyABKAISDAoEbmFtZRgEIAEoCSJFChRHZXRWYWxpZFdlaWdodFJhbmdlcxItCg13ZWlnaHRfcmFuZ2VzGAEgAygLMhYucHJvdG9jb2wuV2VpZ2h0UmFuZ2VzIlAKB0NoYXJnZXISCgoCaWQYASABKAUSFAoMbWF4X3Bvd2VyX2t3GAIgASgFEg8KB2lzX2R1YWwYAyABKAgSEgoKc3RhdGlvbl9pZBgEIAEoBSJLCgtTdGF0aW9uSW5pdBIKCgJpZBgBIAEoDRIfCgNwb3MYAiABKAsyEi5wcm90b2NvbC5Qb3NpdGlvbhIPCgdhZGRyZXNzGAMgASgJIl4KDkluaXRFbmdpbmVEYXRhEiMKCGNoYXJnZXJzGAEgAygLMhEucHJvdG9jb2wuQ2hhcmdlchInCghzdGF0aW9ucxgCIAMoCzIVLnByb3RvY29sLlN0YXRpb25Jbml0IkAKDkVWQ2hhcmdlclN0YXRlEg0KBWV2X2lkGAEgASgFEgsKA3NvYxgCIAEoAhISCgp0YXJnZXRfc29jGAMgASgCIo4BCgxDaGFyZ2VyU3RhdGUSEQoJaXNfYWN0aXZlGAEgASgIEhMKC3V0aWxpemF0aW9uGAIgASgCEhIKCmNoYXJnZXJfaWQYAyABKA0SEgoKcXVldWVfc2l6ZRgEIAEoDRIuCgxldnNfaW5fcXVldWUYBSADKAsyGC5wcm90b2NvbC5FVkNoYXJnZXJTdGF0ZSJBCglFVk9uUm91dGUSDQoFZXZfaWQYASABKAUSJQoJd2F5cG9pbnRzGAIgAygLMhIucHJvdG9jb2wuUG9zaXRpb24ifQoMU3RhdGlvblN0YXRlEhIKCnN0YXRpb25faWQYASABKA0SLgoOY2hhcmdlcl9zdGF0ZXMYAiADKAsyFi5wcm90b2NvbC5DaGFyZ2VyU3RhdGUSKQoMZXZzX29uX3JvdXRlGAMgAygLMhMucHJvdG9jb2wuRVZPblJvdXRlIlsKElNpbXVsYXRpb25TbmFwc2hvdBIRCgl0b3RhbF9ldnMYASABKA0SFgoOdG90YWxfY2hhcmdpbmcYAiABKA0SGgoSc2ltdWxhdGlvbl90aW1lX21zGAMgASgEIlsKGFN0YXRpb25HZW5lcmF0aW9uT3B0aW9ucxInCh9kdWFsX2NoYXJnaW5nX3BvaW50X3Byb2JhYmlsaXR5GAEgASgCEhYKDnRvdGFsX2NoYXJnZXJzGAIgASgFIpwBCgtJbml0UmVxdWVzdBIqCgxjb3N0X3dlaWdodHMYASADKAsyFC5wcm90b2NvbC5Db3N0V2VpZ2h0Ej4KEnN0YXRpb25fZ2VuZXJhdGlvbhgCIAEoCzIiLnByb3RvY29sLlN0YXRpb25HZW5lcmF0aW9uT3B0aW9ucxITCgttYXhpbXVtX2V2cxgDIAEoDRIMCgRzZWVkGAQgASgFIhQKEkdldFNuYXBzaG90UmVxdWVzdCIoChJHZXRTdGF0aW9uU25hcHNob3QSEgoKc3RhdGlvbl9pZBgBIAEoDSJHCgxBcnJpdmFsRXZlbnQSEgoKc3RhdGlvbl9pZBgBIAEoDRINCgVldl9pZBgCIAEoBRIUCgx0aW1lc3RhbXBfbXMYAyABKAQiSwoQQ2hhcmdpbmdFbmRFdmVudBISCgpzdGF0aW9uX2lkGAEgASgNEg0KBWV2X2lkGAIgASgFEhQKDHRpbWVzdGFtcF9tcxgDIAEoBCKvBAoIRW52ZWxvcGUSJQoEaW5pdBgKIAEoCzIVLnByb3RvY29sLkluaXRSZXF1ZXN0SAASNAoMZ2V0X3NuYXBzaG90GAsgASgLMhwucHJvdG9jb2wuR2V0U25hcHNob3RSZXF1ZXN0SAASPAoUZ2V0X3N0YXRpb25fc25hcHNob3QYDCABKAsyHC5wcm90b2NvbC5HZXRTdGF0aW9uU25hcHNob3RIABI0ChBpbml0X2VuZ2luZV9kYXRhGBQgASgLMhgucHJvdG9jb2wuSW5pdEVuZ2luZURhdGFIABI5ChFzbmFwc2hvdF9yZXNwb25zZRgVIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAEj0KE3ZhbGlkX3dlaWdodF9yYW5nZXMYFyABKAsyHi5wcm90b2NvbC5HZXRWYWxpZFdlaWdodFJhbmdlc0gAEjgKFnN0YXRpb25fc3RhdGVfcmVzcG9uc2UYGCABKAsyFi5wcm90b2NvbC5TdGF0aW9uU3RhdGVIABIpCgdhcnJpdmFsGB4gASgLMhYucHJvdG9jb2wuQXJyaXZhbEV2ZW50SAASMgoMY2hhcmdpbmdfZW5kGB8gASgLMhoucHJvdG9jb2wuQ2hhcmdpbmdFbmRFdmVudEgAEjQKDHN0YXRlX3VwZGF0ZRggIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAQgkKB3BheWxvYWRiBnByb3RvMw");
+  fileDesc("CglhcGkucHJvdG8SCHByb3RvY29sIiQKCFBvc2l0aW9uEgsKA2xhdBgBIAEoARILCgNsb24YAiABKAEiLwoKQ29zdFdlaWdodBIKCgJpZBgBIAEoBRIVCg11cGRhdGVkX3ZhbHVlGAIgASgCIlAKB0NoYXJnZXISCgoCaWQYASABKAUSFAoMbWF4X3Bvd2VyX2t3GAIgASgFEg8KB2lzX2R1YWwYAyABKAgSEgoKc3RhdGlvbl9pZBgEIAEoBSJLCgtTdGF0aW9uSW5pdBIKCgJpZBgBIAEoDRIfCgNwb3MYAiABKAsyEi5wcm90b2NvbC5Qb3NpdGlvbhIPCgdhZGRyZXNzGAMgASgJIl4KDkluaXRFbmdpbmVEYXRhEiMKCGNoYXJnZXJzGAEgAygLMhEucHJvdG9jb2wuQ2hhcmdlchInCghzdGF0aW9ucxgCIAMoCzIVLnByb3RvY29sLlN0YXRpb25Jbml0IkAKDkVWQ2hhcmdlclN0YXRlEg0KBWV2X2lkGAEgASgFEgsKA3NvYxgCIAEoAhISCgp0YXJnZXRfc29jGAMgASgCIo4BCgxDaGFyZ2VyU3RhdGUSEQoJaXNfYWN0aXZlGAEgASgIEhMKC3V0aWxpemF0aW9uGAIgASgCEhIKCmNoYXJnZXJfaWQYAyABKA0SEgoKcXVldWVfc2l6ZRgEIAEoDRIuCgxldnNfaW5fcXVldWUYBSADKAsyGC5wcm90b2NvbC5FVkNoYXJnZXJTdGF0ZSJBCglFVk9uUm91dGUSDQoFZXZfaWQYASABKAUSJQoJd2F5cG9pbnRzGAIgAygLMhIucHJvdG9jb2wuUG9zaXRpb24ifQoMU3RhdGlvblN0YXRlEhIKCnN0YXRpb25faWQYASABKA0SLgoOY2hhcmdlcl9zdGF0ZXMYAiADKAsyFi5wcm90b2NvbC5DaGFyZ2VyU3RhdGUSKQoMZXZzX29uX3JvdXRlGAMgAygLMhMucHJvdG9jb2wuRVZPblJvdXRlIigKEkdldFN0YXRpb25TbmFwc2hvdBISCgpzdGF0aW9uX2lkGAEgASgNIkcKDEFycml2YWxFdmVudBISCgpzdGF0aW9uX2lkGAEgASgNEg0KBWV2X2lkGAIgASgFEhQKDHRpbWVzdGFtcF9tcxgDIAEoBCJLChBDaGFyZ2luZ0VuZEV2ZW50EhIKCnN0YXRpb25faWQYASABKA0SDQoFZXZfaWQYAiABKAUSFAoMdGltZXN0YW1wX21zGAMgASgEIlsKElNpbXVsYXRpb25TbmFwc2hvdBIRCgl0b3RhbF9ldnMYASABKA0SFgoOdG90YWxfY2hhcmdpbmcYAiABKA0SGgoSc2ltdWxhdGlvbl90aW1lX21zGAMgASgEItgCCghFbnZlbG9wZRI8ChRnZXRfc3RhdGlvbl9zbmFwc2hvdBgKIAEoCzIcLnByb3RvY29sLkdldFN0YXRpb25TbmFwc2hvdEgAEjQKEGluaXRfZW5naW5lX2RhdGEYFCABKAsyGC5wcm90b2NvbC5Jbml0RW5naW5lRGF0YUgAEjgKFnN0YXRpb25fc3RhdGVfcmVzcG9uc2UYFSABKAsyFi5wcm90b2NvbC5TdGF0aW9uU3RhdGVIABIpCgdhcnJpdmFsGB4gASgLMhYucHJvdG9jb2wuQXJyaXZhbEV2ZW50SAASMgoMY2hhcmdpbmdfZW5kGB8gASgLMhoucHJvdG9jb2wuQ2hhcmdpbmdFbmRFdmVudEgAEjQKDHN0YXRlX3VwZGF0ZRggIAEoCzIcLnByb3RvY29sLlNpbXVsYXRpb25TbmFwc2hvdEgAQgkKB3BheWxvYWRiBnByb3RvMw");
 
 /**
+ * Represents a geographic position with latitude and longitude
+ *
  * @generated from message protocol.Position
  */
 export type Position = Message<"protocol.Position"> & {
@@ -35,6 +37,8 @@ export const PositionSchema: GenMessage<Position> = /*@__PURE__*/
   messageDesc(file_api, 0);
 
 /**
+ * Represents a cost weight for a specific factor (e.g., Pricesensitivity, PathDeviation etc.)
+ *
  * @generated from message protocol.CostWeight
  */
 export type CostWeight = Message<"protocol.CostWeight"> & {
@@ -57,57 +61,8 @@ export const CostWeightSchema: GenMessage<CostWeight> = /*@__PURE__*/
   messageDesc(file_api, 1);
 
 /**
- * @generated from message protocol.WeightRanges
- */
-export type WeightRanges = Message<"protocol.WeightRanges"> & {
-  /**
-   * @generated from field: int32 id = 1;
-   */
-  id: number;
-
-  /**
-   * @generated from field: float minimum = 2;
-   */
-  minimum: number;
-
-  /**
-   * @generated from field: float maximum = 3;
-   */
-  maximum: number;
-
-  /**
-   * @generated from field: string name = 4;
-   */
-  name: string;
-};
-
-/**
- * Describes the message protocol.WeightRanges.
- * Use `create(WeightRangesSchema)` to create a new message.
- */
-export const WeightRangesSchema: GenMessage<WeightRanges> = /*@__PURE__*/
-  messageDesc(file_api, 2);
-
-/**
- * Request to get possible weights, ids and their name and valid value ranges
+ * Represents a charger at a station, including its max power and whether it's dual or single
  *
- * @generated from message protocol.GetValidWeightRanges
- */
-export type GetValidWeightRanges = Message<"protocol.GetValidWeightRanges"> & {
-  /**
-   * @generated from field: repeated protocol.WeightRanges weight_ranges = 1;
-   */
-  weightRanges: WeightRanges[];
-};
-
-/**
- * Describes the message protocol.GetValidWeightRanges.
- * Use `create(GetValidWeightRangesSchema)` to create a new message.
- */
-export const GetValidWeightRangesSchema: GenMessage<GetValidWeightRanges> = /*@__PURE__*/
-  messageDesc(file_api, 3);
-
-/**
  * @generated from message protocol.Charger
  */
 export type Charger = Message<"protocol.Charger"> & {
@@ -137,9 +92,11 @@ export type Charger = Message<"protocol.Charger"> & {
  * Use `create(ChargerSchema)` to create a new message.
  */
 export const ChargerSchema: GenMessage<Charger> = /*@__PURE__*/
-  messageDesc(file_api, 4);
+  messageDesc(file_api, 2);
 
 /**
+ * Represents the initial data for a station sent from the engine to the client upon connection
+ *
  * @generated from message protocol.StationInit
  */
 export type StationInit = Message<"protocol.StationInit"> & {
@@ -164,9 +121,11 @@ export type StationInit = Message<"protocol.StationInit"> & {
  * Use `create(StationInitSchema)` to create a new message.
  */
 export const StationInitSchema: GenMessage<StationInit> = /*@__PURE__*/
-  messageDesc(file_api, 5);
+  messageDesc(file_api, 3);
 
 /**
+ * Initial data sent from the engine to the client upon connection, containing all stations and chargers
+ *
  * @generated from message protocol.InitEngineData
  */
 export type InitEngineData = Message<"protocol.InitEngineData"> & {
@@ -186,9 +145,11 @@ export type InitEngineData = Message<"protocol.InitEngineData"> & {
  * Use `create(InitEngineDataSchema)` to create a new message.
  */
 export const InitEngineDataSchema: GenMessage<InitEngineData> = /*@__PURE__*/
-  messageDesc(file_api, 6);
+  messageDesc(file_api, 4);
 
 /**
+ * Represents the state of a single EV in a charger queue.
+ *
  * @generated from message protocol.EVChargerState
  */
 export type EVChargerState = Message<"protocol.EVChargerState"> & {
@@ -213,9 +174,11 @@ export type EVChargerState = Message<"protocol.EVChargerState"> & {
  * Use `create(EVChargerStateSchema)` to create a new message.
  */
 export const EVChargerStateSchema: GenMessage<EVChargerState> = /*@__PURE__*/
-  messageDesc(file_api, 7);
+  messageDesc(file_api, 5);
 
 /**
+ * Represents the state of a single charger.
+ *
  * @generated from message protocol.ChargerState
  */
 export type ChargerState = Message<"protocol.ChargerState"> & {
@@ -250,9 +213,11 @@ export type ChargerState = Message<"protocol.ChargerState"> & {
  * Use `create(ChargerStateSchema)` to create a new message.
  */
 export const ChargerStateSchema: GenMessage<ChargerState> = /*@__PURE__*/
-  messageDesc(file_api, 8);
+  messageDesc(file_api, 6);
 
 /**
+ * Represents an EV currently on route to a station, including its waypoints
+ *
  * @generated from message protocol.EVOnRoute
  */
 export type EVOnRoute = Message<"protocol.EVOnRoute"> & {
@@ -272,9 +237,11 @@ export type EVOnRoute = Message<"protocol.EVOnRoute"> & {
  * Use `create(EVOnRouteSchema)` to create a new message.
  */
 export const EVOnRouteSchema: GenMessage<EVOnRoute> = /*@__PURE__*/
-  messageDesc(file_api, 9);
+  messageDesc(file_api, 7);
 
 /**
+ * Snapshot of a station's state, including all chargers and EVs currently on route to it
+ *
  * @generated from message protocol.StationState
  */
 export type StationState = Message<"protocol.StationState"> & {
@@ -299,105 +266,11 @@ export type StationState = Message<"protocol.StationState"> & {
  * Use `create(StationStateSchema)` to create a new message.
  */
 export const StationStateSchema: GenMessage<StationState> = /*@__PURE__*/
-  messageDesc(file_api, 10);
+  messageDesc(file_api, 8);
 
 /**
- * @generated from message protocol.SimulationSnapshot
- */
-export type SimulationSnapshot = Message<"protocol.SimulationSnapshot"> & {
-  /**
-   * @generated from field: uint32 total_evs = 1;
-   */
-  totalEvs: number;
-
-  /**
-   * @generated from field: uint32 total_charging = 2;
-   */
-  totalCharging: number;
-
-  /**
-   * @generated from field: uint64 simulation_time_ms = 3;
-   */
-  simulationTimeMs: bigint;
-};
-
-/**
- * Describes the message protocol.SimulationSnapshot.
- * Use `create(SimulationSnapshotSchema)` to create a new message.
- */
-export const SimulationSnapshotSchema: GenMessage<SimulationSnapshot> = /*@__PURE__*/
-  messageDesc(file_api, 11);
-
-/**
- * @generated from message protocol.StationGenerationOptions
- */
-export type StationGenerationOptions = Message<"protocol.StationGenerationOptions"> & {
-  /**
-   * @generated from field: float dual_charging_point_probability = 1;
-   */
-  dualChargingPointProbability: number;
-
-  /**
-   * @generated from field: int32 total_chargers = 2;
-   */
-  totalChargers: number;
-};
-
-/**
- * Describes the message protocol.StationGenerationOptions.
- * Use `create(StationGenerationOptionsSchema)` to create a new message.
- */
-export const StationGenerationOptionsSchema: GenMessage<StationGenerationOptions> = /*@__PURE__*/
-  messageDesc(file_api, 12);
-
-/**
- * @generated from message protocol.InitRequest
- */
-export type InitRequest = Message<"protocol.InitRequest"> & {
-  /**
-   * @generated from field: repeated protocol.CostWeight cost_weights = 1;
-   */
-  costWeights: CostWeight[];
-
-  /**
-   * @generated from field: protocol.StationGenerationOptions station_generation = 2;
-   */
-  stationGeneration?: StationGenerationOptions;
-
-  /**
-   * @generated from field: uint32 maximum_evs = 3;
-   */
-  maximumEvs: number;
-
-  /**
-   * @generated from field: int32 seed = 4;
-   */
-  seed: number;
-};
-
-/**
- * Describes the message protocol.InitRequest.
- * Use `create(InitRequestSchema)` to create a new message.
- */
-export const InitRequestSchema: GenMessage<InitRequest> = /*@__PURE__*/
-  messageDesc(file_api, 13);
-
-/**
- * Empty, but required for request/response symmetry
+ * Request a snapshot of a specific station's state
  *
- * @generated from message protocol.GetSnapshotRequest
- */
-export type GetSnapshotRequest = Message<"protocol.GetSnapshotRequest"> & {
-};
-
-/**
- * Describes the message protocol.GetSnapshotRequest.
- * Use `create(GetSnapshotRequestSchema)` to create a new message.
- */
-export const GetSnapshotRequestSchema: GenMessage<GetSnapshotRequest> = /*@__PURE__*/
-  messageDesc(file_api, 14);
-
-/**
  * @generated from message protocol.GetStationSnapshot
  */
 export type GetStationSnapshot = Message<"protocol.GetStationSnapshot"> & {
@@ -412,9 +285,11 @@ export type GetStationSnapshot = Message<"protocol.GetStationSnapshot"> & {
  * Use `create(GetStationSnapshotSchema)` to create a new message.
  */
 export const GetStationSnapshotSchema: GenMessage<GetStationSnapshot> = /*@__PURE__*/
-  messageDesc(file_api, 15);
+  messageDesc(file_api, 9);
 
 /**
+ * ArrivalAtStation event trigger in the engine
+ *
  * @generated from message protocol.ArrivalEvent
  */
 export type ArrivalEvent = Message<"protocol.ArrivalEvent"> & {
@@ -439,9 +314,11 @@ export type ArrivalEvent = Message<"protocol.ArrivalEvent"> & {
  * Use `create(ArrivalEventSchema)` to create a new message.
  */
 export const ArrivalEventSchema: GenMessage<ArrivalEvent> = /*@__PURE__*/
-  messageDesc(file_api, 16);
+  messageDesc(file_api, 10);
 
 /**
+ * EndCharging event trigger in the engine
+ *
  * @generated from message protocol.ChargingEndEvent
  */
 export type ChargingEndEvent = Message<"protocol.ChargingEndEvent"> & {
@@ -466,7 +343,36 @@ export type ChargingEndEvent = Message<"protocol.ChargingEndEvent"> & {
  * Use `create(ChargingEndEventSchema)` to create a new message.
  */
 export const ChargingEndEventSchema: GenMessage<ChargingEndEvent> = /*@__PURE__*/
-  messageDesc(file_api, 17);
+  messageDesc(file_api, 11);
+
+/**
+ * Periodic snapshot of the overall simulation state (e.g., every second)
+ *
+ * @generated from message protocol.SimulationSnapshot
+ */
+export type SimulationSnapshot = Message<"protocol.SimulationSnapshot"> & {
+  /**
+   * @generated from field: uint32 total_evs = 1;
+   */
+  totalEvs: number;
+
+  /**
+   * @generated from field: uint32 total_charging = 2;
+   */
+  totalCharging: number;
+
+  /**
+   * @generated from field: uint64 simulation_time_ms = 3;
+   */
+  simulationTimeMs: bigint;
+};
+
+/**
+ * Describes the message protocol.SimulationSnapshot.
+ * Use `create(SimulationSnapshotSchema)` to create a new message.
+ */
+export const SimulationSnapshotSchema: GenMessage<SimulationSnapshot> = /*@__PURE__*/
+  messageDesc(file_api, 12);
 
 /**
  *
@@ -486,19 +392,7 @@ export type Envelope = Message<"protocol.Envelope"> & {
     /**
      * Client Requests (10-19)
      *
-     * @generated from field: protocol.InitRequest init = 10;
-     */
-    value: InitRequest;
-    case: "init";
-  } | {
-    /**
-     * @generated from field: protocol.GetSnapshotRequest get_snapshot = 11;
-     */
-    value: GetSnapshotRequest;
-    case: "getSnapshot";
-  } | {
-    /**
-     * @generated from field: protocol.GetStationSnapshot get_station_snapshot = 12;
+     * @generated from field: protocol.GetStationSnapshot get_station_snapshot = 10;
      */
     value: GetStationSnapshot;
     case: "getStationSnapshot";
@@ -506,31 +400,15 @@ export type Envelope = Message<"protocol.Envelope"> & {
     /**
      * Server Responses (20-29)
      *
-     * response to InitRequest
-     *
      * @generated from field: protocol.InitEngineData init_engine_data = 20;
      */
     value: InitEngineData;
     case: "initEngineData";
   } | {
     /**
-     * response to GetSnapshotRequest
-     *
-     * @generated from field: protocol.SimulationSnapshot snapshot_response = 21;
-     */
-    value: SimulationSnapshot;
-    case: "snapshotResponse";
-  } | {
-    /**
-     * @generated from field: protocol.GetValidWeightRanges valid_weight_ranges = 23;
-     */
-    value: GetValidWeightRanges;
-    case: "validWeightRanges";
-  } | {
-    /**
      * response to GetStationSnapshot
      *
-     * @generated from field: protocol.StationState station_state_response = 24;
+     * @generated from field: protocol.StationState station_state_response = 21;
      */
     value: StationState;
     case: "stationStateResponse";
@@ -562,5 +440,5 @@ export type Envelope = Message<"protocol.Envelope"> & {
  * Use `create(EnvelopeSchema)` to create a new message.
  */
 export const EnvelopeSchema: GenMessage<Envelope> = /*@__PURE__*/
-  messageDesc(file_api, 18);
+  messageDesc(file_api, 13);
 

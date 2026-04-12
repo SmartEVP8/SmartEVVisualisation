@@ -3,6 +3,7 @@ import { initializeSimulation } from '../api/init';
 import type { InitEngineConfig, InitEngineResponse } from '../api/types';
 import type { ChargerState } from '../types/chargerState';
 import type { Charger, Station } from '../types/station';
+import { startSimulationWS } from '@/api/ws/ws';
 
 function mapInitResponseToStations(response: InitEngineResponse): Station[] {
   return response.stations.map((station) => ({
@@ -43,6 +44,7 @@ export function useSimulationData() {
       setStations(mapInitResponseToStations(response));
       setChargers(mapInitResponseToChargers(response));
       setChargerStates([]);
+      startSimulationWS()
       setHasSimulationStarted(true);
     } catch (error) {
       setSimulationError(
