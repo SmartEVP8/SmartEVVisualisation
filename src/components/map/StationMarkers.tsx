@@ -1,23 +1,18 @@
+// components/map/StationMarkers.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import type { Charger, Station } from '../../types/station';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { stationsConfigAtom } from '@/store/simulationStore';
+import { selectedStationAtom } from '@/store/uiStore';
 import { StationMarker } from './StationMarker';
 
-type Props = {
-  stations: Station[];
-  chargersByStationId: Map<number, Charger[]>;
-  onSelect: (station: Station, chargers: Charger[]) => void;
-};
-
-
-function StationMarkersComponent({
-  stations,
-  chargersByStationId,
-  onSelect,
-}: Props) {
+function StationMarkersComponent() {
   const map = useMap();
   const [bounds, setBounds] = useState(() => map.getBounds());
+
+  const stationsConfig = useAtomValue(stationsConfigAtom);
+  const setSelectedStation = useSetAtom(selectedStationAtom);
 
   useEffect(() => {
     const updateBounds = () => setBounds(map.getBounds());
@@ -29,12 +24,14 @@ function StationMarkersComponent({
     };
   }, [map]);
 
+  const stationsArray = useMemo(() => Object.values(stationsConfig), [stationsConfig]);
+
   const visibleStations = useMemo(() => {
-    if (!bounds) return stations;
-    return stations.filter((station) =>
+    if (!bounds) return stationsArray;
+    return stationsArray.filter((station) =>
       bounds.contains([station.pos.lat, station.pos.lon])
     );
-  }, [stations, bounds]);
+  }, [stationsArray, bounds]);
 
   return (
     <MarkerClusterGroup
@@ -43,17 +40,13 @@ function StationMarkersComponent({
       spiderfyOnMaxZoom
       showCoverageOnHover={false}
     >
-      {visibleStations.map((station) => {
-        const stationChargers = chargersByStationId.get(station.id) ?? [];
-        return (
-          <StationMarker
-            key={station.id}
-            station={station}
-            chargers={stationChargers}
-            onSelect={onSelect}
-          />
-        );
-      })}
+      {visibleStations.map((station) => (
+        <StationMarker
+          key={station.id}
+          station={station}
+          onSelect={() => setSelectedStation({ station })}
+        />
+      ))}
     </MarkerClusterGroup>
   );
 }

@@ -9,7 +9,7 @@ type Position = {
 
 // --- Static Configurations ---
 
-type StationConfig = {
+export type StationConfig = {
   id: number;
   pos: Position;
   address: string;
