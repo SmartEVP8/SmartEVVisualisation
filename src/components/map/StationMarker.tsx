@@ -3,12 +3,11 @@ import React, { useCallback } from 'react';
 import { BatteryCharging } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Marker, useMap } from 'react-leaflet';
-import type { Charger, Station } from '../../types/station';
+import type { StationConfig } from '@/store/simulationStore';
 
 type Props = {
-  station: Station;
-  chargers?: Charger[];
-  onSelect: (station: Station, chargers: Charger[]) => void;
+  station: StationConfig;
+  onSelect: (station: StationConfig) => void;
 };
 
 const stationGlyphMarkup = renderToStaticMarkup(
@@ -49,15 +48,15 @@ const icon = L.divIcon({
   iconAnchor: [20, 52],
 });
 
-function StationMarkerComponent({ station, chargers = [], onSelect }: Props) {
+function StationMarkerComponent({ station, onSelect }: Props) {
   const map = useMap();
 
   const handleClick = useCallback(() => {
     map.flyTo([station.pos.lat, station.pos.lon], 18, {
       duration: 1.2,
     });
-    onSelect(station, chargers);
-  }, [map, station, chargers, onSelect]);
+    onSelect(station);
+  }, [map, station, onSelect]);
 
   return (
     <Marker

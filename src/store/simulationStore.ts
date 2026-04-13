@@ -2,7 +2,7 @@ import { atom, createStore } from 'jotai/vanilla';
 import type { ArrivalEvent, ChargingEndEvent, Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
 
 // INFO : Models
-type Position = {
+export type Position = {
   lat: number;
   lon: number;
 };
@@ -15,7 +15,7 @@ export type StationConfig = {
   address: string;
 };
 
-type ChargerConfig = {
+export type ChargerConfig = {
   id: number;
   maxEnergyKWh: number;
   isDual: boolean;
@@ -23,20 +23,20 @@ type ChargerConfig = {
 };
 
 // --- Mutable States ---
-type EVInQueue = {
+export type EVInQueue = {
   id: number;
   soc: number;
   targetSoC: number;
 };
 
-type ChargerState = {
+export type ChargerState = {
   isActive: boolean;
   utilization: number;
   chargerId: number;
   queue: EVInQueue[];
 };
 
-type EVOnRoute = {
+export type EVOnRoute = {
   id: number;
   waypoints: Position[];
 };

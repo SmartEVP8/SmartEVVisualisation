@@ -1,19 +1,15 @@
-// pages/SimulationPage.tsx
 import type { Map as LeafletMap } from 'leaflet';
 import { useRef, useState, useMemo } from 'react';
-import { useAtomValue, useSetAtom, useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { Polyline } from 'react-leaflet';
 import { MapView } from '../components/map/MapView';
 import { StationMarkers } from '../components/map/StationMarkers';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
-import type { Position } from '@/api/generated/api_pb';
-import { evsOnRouteAtom } from '@/store/simulationStore';
+import { evsOnRouteAtom, type Position } from '@/store/simulationStore';
 import {
   selectedStationAtom,
   isShowingRoutesAtom,
-  isSidebarCollapsedAtom,
-  clearSelectionAction
 } from '@/store/uiStore';
 
 type RoutePoint = [number, number];
@@ -24,9 +20,6 @@ export function SimulationPage() {
 
   const selectedStationPayload = useAtomValue(selectedStationAtom);
   const isShowingRoutes = useAtomValue(isShowingRoutesAtom);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useAtom(isSidebarCollapsedAtom);
-  const clearSelection = useSetAtom(clearSelectionAction);
-
   const evsOnRoute = useAtomValue(evsOnRouteAtom);
 
   const incomingRoutes = useMemo(() => {
@@ -35,7 +28,6 @@ export function SimulationPage() {
   }, [selectedStationPayload, evsOnRoute]);
 
   const handleShowIncomingRoutes = (points: Position[]) => {
-    setIsSidebarCollapsed(true);
     const mapped = points.map(elm => [elm.lat, elm.lon] as RoutePoint);
     if (mapped.length <= 2) return;
 
@@ -53,7 +45,6 @@ export function SimulationPage() {
       duration: 0.7,
     });
   };
-
   if (!hasSimStarted) {
     return (
       <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
@@ -88,12 +79,8 @@ export function SimulationPage() {
 
       {selectedStationPayload && (
         <StationSidebar
-          selectedStation={selectedStationPayload}
-          onClose={clearSelection}
           onShowIncomingRoutes={handleShowIncomingRoutes}
           onFocusStation={handleFocusPosition}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapsed={() => setIsSidebarCollapsed(prev => !prev)}
         />
       )}
     </div>
