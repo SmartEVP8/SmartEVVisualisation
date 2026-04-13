@@ -8,6 +8,7 @@ export type SelectedStationPayload = {
 export const selectedStationAtom = atom<SelectedStationPayload>(null);
 export const isSidebarCollapsedAtom = atom(false);
 export const isShowingRoutesAtom = atom(false);
+export const isWeightSidebarCollapsedAtom = atom(false);
 
 export const clearSelectionAction = atom(
   null,

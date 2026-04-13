@@ -13,3 +13,14 @@ export const setFullWeightsAction = atom(
     set(weightMetadataAtom, newWeights);
   }
 );
+
+export const setSingleWeightAction = atom(
+  null,
+  (get, set, payload: { id: number; value: number }) => {
+    const currentWeights = get(weightMetadataAtom);
+    const updatedWeights = currentWeights.map((weight) =>
+      weight.id === payload.id ? { ...weight, value: payload.value } : weight
+    );
+    set(weightMetadataAtom, updatedWeights);
+  }
+);
