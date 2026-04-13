@@ -2,7 +2,7 @@ import type { Map as LeafletMap } from 'leaflet';
 import { useMemo, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { Polyline } from 'react-leaflet';
-import { SlidersHorizontal } from 'lucide-react';
+import { Clock, PauseIcon, PlayIcon, SlidersHorizontal, Truck, Zap } from 'lucide-react';
 
 import { MapView } from '../components/map/MapView';
 import { StationMarkers } from '../components/map/StationMarkers';
@@ -11,11 +11,14 @@ import { UpdateWeightsSidebar } from '@/components/SimulationPage/UpdateWeightsB
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { Button } from '@/components/ui/button';
 
-import { evsOnRouteAtom, type Position } from '@/store/simulationStore';
+import { evsOnRouteAtom, globalStatsAtom, simulationTimeAtom, type Position } from '@/store/simulationStore';
 import {
   isShowingRoutesAtom,
   selectedStationAtom,
 } from '@/store/uiStore';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { msToPrettyDisplay } from '@/lib/msToPrettyDisplay';
 
 type RoutePoint = [number, number];
 
@@ -85,18 +88,19 @@ export function SimulationPage() {
             );
           })}
       </MapView>
+      <Topbar />
 
       {!isWeightsSidebarOpen && (
         <Button
-        type="button"
-        variant="default"
-        size="icon-lg"
-        className="absolute top-4 left-4 z-[1200]"
-        onClick={() => setIsWeightsSidebarOpen((current) => !current)}
-        aria-label="Toggle weights sidebar"
-      >
-        <SlidersHorizontal />
-      </Button>
+          type="button"
+          variant="default"
+          size="icon-lg"
+          className="absolute top-4 left-4 z-[1200]"
+          onClick={() => setIsWeightsSidebarOpen((current) => !current)}
+          aria-label="Toggle weights sidebar"
+        >
+          <SlidersHorizontal />
+        </Button>
       )}
 
       {isWeightsSidebarOpen && (
@@ -114,3 +118,41 @@ export function SimulationPage() {
     </div>
   );
 }
+
+
+const Topbar = () => {
+  //TODO: WIRE UP TO PLAY AND PAUSE
+  const time = useAtomValue(simulationTimeAtom);
+  const simState = useAtomValue(globalStatsAtom);
+  const [isRunning, setIsRunning] = useState(true)
+
+  return (
+    <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1200]">
+      <Card className="flex flex-row items-center gap-0 px-5 py-2.5 shadow-none">
+        <div className="flex items-center gap-4 pr-5">
+          <Truck className="w-5 h-5 text-blue-500 shrink-0" />
+          <span className="text-base font-medium font-mono">{simState.totalEvs}</span>
+        </div>
+
+        <Button
+          variant={isRunning ? "default" : "outline"}
+          onClick={() => setIsRunning(prev => !prev)}>
+          {isRunning ? <PauseIcon /> : <PlayIcon />}
+          {isRunning ? "Pause" : "Resume"}
+        </Button>
+
+        <div className="flex items-center gap-4 px-5">
+          <Clock className="w-5 h-5 text-muted-foreground shrink-0" />
+          <span className="text-base font-medium font-mono">{msToPrettyDisplay(time)}</span>
+        </div>
+
+        <Separator orientation="vertical" className="h-8" />
+
+        <div className="flex items-center gap-4 pl-5">
+          <Zap className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span className="text-base font-medium font-mono">{simState.totalCharging}</span>
+        </div>
+      </Card>
+    </div>
+  );
+};
