@@ -1,5 +1,6 @@
-import { atom, createStore } from 'jotai/vanilla';
-import type { ArrivalEvent, ChargingEndEvent, Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
+import { atom, createStore, type Atom, type PrimitiveAtom } from 'jotai/vanilla';
+import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
+import type { StationStatus } from '@/components/map/StationMarker';
 
 // INFO : Models
 export type Position = {
@@ -45,107 +46,99 @@ export type EVOnRoute = {
 
 export const simulationStore = createStore();
 
-// --- Static Atoms (Populated via InitEngineData) ---
+// --- Static Atoms ---
 export const stationsConfigAtom = atom<Record<number, StationConfig>>({});
 export const chargersConfigAtom = atom<Record<number, ChargerConfig>>({});
 
-// --- Dynamic Atoms (Updated via WS Events) ---
-export const chargerStatesAtom = atom<Record<number, ChargerState>>({});
+// --- Dynamic Atoms ---
 export const evsOnRouteAtom = atom<Record<number, EVOnRoute[]>>({});
 export const simulationTimeAtom = atom<number>(0);
 export const globalStatsAtom = atom({ totalEvs: 0, totalCharging: 0 });
 
+const chargerStateAtomCache = new Map<number, PrimitiveAtom<Record<number, ChargerState>>>();
 
-// Sets the immutable config for stations and chargers.
-export const handleInitEngineDataAction = atom(
-  null,
-  (get, set, payload: InitEngineData) => {
-    const stationsRecord: Record<number, StationConfig> = {};
-    payload.stations.forEach((s: any) => {
-      stationsRecord[s.id] = { id: s.id, pos: s.pos, address: s.address };
-    });
-
-    const chargersRecord: Record<number, ChargerConfig> = {};
-    payload.chargers.forEach((c: any) => {
-      chargersRecord[c.id] = {
-        id: c.id,
-        maxEnergyKWh: c.maxPowerKw,
-        isDual: c.isDual,
-        stationId: c.stationId
-      };
-    });
-
-    set(stationsConfigAtom, stationsRecord);
-    set(chargersConfigAtom, chargersRecord);
+export function getChargerStatesAtom(stationId: number) {
+  if (!chargerStateAtomCache.has(stationId)) {
+    chargerStateAtomCache.set(stationId, atom<Record<number, ChargerState>>({}));
   }
-);
+  return chargerStateAtomCache.get(stationId)!;
+}
+
+const STATUS_RANK: Record<StationStatus, number> = { idle: 0, busy: 1, full: 2 };
+const stationStatusCache = new Map<number, Atom<StationStatus>>();
+
+export function getStationStatusAtom(stationId: number) {
+  if (!stationStatusCache.has(stationId)) {
+    stationStatusCache.set(
+      stationId,
+      atom((get): StationStatus => {
+        const chargers = get(chargersConfigAtom);
+        const states = get(getChargerStatesAtom(stationId));
+
+        let rank = 0;
+        for (const charger of Object.values(chargers)) {
+          if (charger.stationId !== stationId) continue;
+          const queueLen = states[charger.id]?.queue.length ?? 0;
+          const next: StationStatus = queueLen === 0 ? 'idle' : queueLen < 3 ? 'busy' : 'full';
+          if (STATUS_RANK[next] > rank) rank = STATUS_RANK[next];
+        }
+        return (['idle', 'busy', 'full'] as const)[rank];
+      })
+    );
+  }
+  return stationStatusCache.get(stationId)!;
+}
 
 // --- Mutation Actions ---
-export const handleArrivalEvent = atom(
-  null,
-  (get, set, payload: ArrivalEvent) => {
+export const handleInitEngineDataAction = atom(null, (get, set, payload: InitEngineData) => {
+  const stationsRecord: Record<number, StationConfig> = {};
+  payload.stations.forEach((s: any) => {
+    stationsRecord[s.id] = { id: s.id, pos: s.pos, address: s.address };
+  });
 
-  }
-)
+  const chargersRecord: Record<number, ChargerConfig> = {};
+  payload.chargers.forEach((c: any) => {
+    chargersRecord[c.id] = { id: c.id, maxEnergyKWh: c.maxPowerKw, isDual: c.isDual, stationId: c.stationId };
+  });
 
-export const handleEndChargingEvent = atom(
-  null,
-  (get, set, payload: ChargingEndEvent) => {
+  set(stationsConfigAtom, stationsRecord);
+  set(chargersConfigAtom, chargersRecord);
+});
 
-  }
-)
 
-export const handleSimulationSnapshotAction = atom(
-  null,
-  (get, set, payload: SimulationSnapshot) => {
-    set(simulationTimeAtom, Number(payload.simulationTimeMs));
-    set(globalStatsAtom, {
-      totalEvs: payload.totalEvs,
-      totalCharging: payload.totalCharging
-    });
-  }
-)
-export const handleUpdateStationState = atom(
-  null,
-  (get, set, payload: StationState) => {
-    const stationId = payload.stationId;
+export const handleSimulationSnapshotAction = atom(null, (get, set, payload: SimulationSnapshot) => {
+  set(simulationTimeAtom, Number(payload.simulationTimeMs));
+  set(globalStatsAtom, { totalEvs: payload.totalEvs, totalCharging: payload.totalCharging });
+});
 
-    set(chargerStatesAtom, (prev) => {
-      const updatedStates = { ...prev };
-      payload.chargerStates.forEach((cs) => {
-        updatedStates[cs.chargerId] = {
-          isActive: cs.isActive,
-          utilization: cs.utilization,
-          chargerId: cs.chargerId,
-          queue: cs.evsInQueue.map((ev) => ({
-            id: ev.evId,
-            soc: ev.soc,
-            targetSoC: ev.targetSoc
-          }))
-        };
-      });
-      return updatedStates;
-    });
+export const handleUpdateStationState = atom(null, (get, set, payload: StationState) => {
+  const stationChargerStates: Record<number, ChargerState> = {};
+  payload.chargerStates.forEach((cs) => {
+    stationChargerStates[cs.chargerId] = {
+      isActive: cs.isActive,
+      utilization: cs.utilization,
+      chargerId: cs.chargerId,
+      queue: cs.evsInQueue.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc }))
+    };
+  });
 
-    set(evsOnRouteAtom, (prev) => ({
-      ...prev,
-      [stationId]: payload.evsOnRoute.map((ev) => ({
-        id: ev.evId,
-        waypoints: ev.waypoints
-      }))
-    }));
-  }
-);
+  set(getChargerStatesAtom(payload.stationId), stationChargerStates);
+
+  set(evsOnRouteAtom, (prev) => ({
+    ...prev,
+    [payload.stationId]: payload.evsOnRoute.map((ev) => ({ id: ev.evId, waypoints: ev.waypoints }))
+  }));
+});
 
 export const dispatchWSEventAction = atom(
   null,
   (get, set, payload: Exclude<Envelope["payload"], { case: undefined }>) => {
     switch (payload.case) {
       case "arrival":
-        set(handleArrivalEvent, payload.value);
+        //TODO: DELETE
         break;
       case "chargingEnd":
-        set(handleEndChargingEvent, payload.value);
+        //TOOD: DELETE
         break;
       case "stateUpdate":
         set(handleSimulationSnapshotAction, payload.value);
@@ -157,7 +150,7 @@ export const dispatchWSEventAction = atom(
         console.warn("Client received a client-only request type.");
         break;
       case "initEngineData":
-        set(handleInitEngineDataAction, payload.value)
+        set(handleInitEngineDataAction, payload.value);
         break;
       default:
         console.warn("Unhandled event type routed to store:", payload);

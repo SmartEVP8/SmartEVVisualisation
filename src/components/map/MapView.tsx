@@ -1,6 +1,6 @@
 import type { LatLngBoundsExpression, Map as LeafletMap } from 'leaflet';
 import type { ReactNode, Ref } from 'react';
-import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, ZoomControl, useMap } from 'react-leaflet';
 
 type MapViewProps = {
   children?: ReactNode;
@@ -32,6 +32,8 @@ export function MapView({ children, mapRef }: MapViewProps) {
           tileSize={512}
           zoomOffset={-1}
           noWrap
+          updateWhenIdle={false}
+          updateWhenZooming={false}
           attribution="&copy; MapTiler &copy; OpenStreetMap contributors"
         />
 

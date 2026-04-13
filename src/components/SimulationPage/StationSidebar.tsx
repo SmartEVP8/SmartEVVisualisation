@@ -15,7 +15,7 @@ import {
   clearSelectionAction,
   isShowingRoutesAtom
 } from '@/store/uiStore';
-import { chargersConfigAtom, chargerStatesAtom, evsOnRouteAtom, type ChargerConfig, type ChargerState, type EVInQueue, type Position } from '@/store/simulationStore';
+import { chargersConfigAtom, evsOnRouteAtom, getChargerStatesAtom, type ChargerConfig, type ChargerState, type EVInQueue, type Position } from '@/store/simulationStore';
 
 type StationSidebarProps = {
   onShowIncomingRoutes: (points: Position[]) => void;
@@ -34,7 +34,10 @@ export function StationSidebar({
 
   const selectedStation = useAtomValue(selectedStationAtom);
   const chargersConfig = useAtomValue(chargersConfigAtom);
-  const chargerStates = useAtomValue(chargerStatesAtom);
+  const selectedStationId = selectedStation?.station.id ?? -1;
+  const chargerStates = useAtomValue(
+    useMemo(() => getChargerStatesAtom(selectedStationId), [selectedStationId])
+  );
   const evsOnRoute = useAtomValue(evsOnRouteAtom);
 
   const stationChargers = useMemo(() => {
