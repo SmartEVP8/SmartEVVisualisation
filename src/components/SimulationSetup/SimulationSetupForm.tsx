@@ -17,7 +17,7 @@ const simulationConfigSchema = (weightMetadata: WeightMetadata[]) =>
   z.object({
     maximumEVs: z.number().min(1, 'Must be at least 1').max(550000, 'Must be at most 550000'),
     seed: z.number().min(0, 'Must be at least 0'),
-    dualChargingProbability: z.number().min(0, 'Must be at least 0').max(1, 'Must be at most 1'),
+    dualChargerProbability: z.number().min(0, 'Must be at least 0').max(1, 'Must be at most 1'),
     numberOfChargers: z.number().min(1, 'Must be at least 1').max(7500, 'Must be at most 2500'),
     costWeights: z.array(
       z.object({
@@ -61,7 +61,7 @@ const simulationConfigSchema = (weightMetadata: WeightMetadata[]) =>
 
 const createInitialConfig = (): InitEngineConfig => ({
   costWeights: [],
-  dualChargingProbability: 0.8,
+  dualChargerProbability: 0.8,
   numberOfChargers: 5000,
   maximumEVs: 50000,
   seed: 42,
@@ -182,13 +182,13 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                   min={0}
                   max={1}
                   step={0.1}
-                  value={[config.dualChargingProbability]}
-                  onValueChange={(values) => setConfig((prev) => ({ ...prev, dualChargingProbability: values[0] ?? 0 }))}
+                  value={[config.dualChargerProbability]}
+                  onValueChange={(values) => setConfig((prev) => ({ ...prev, dualChargerProbability: values[0] ?? 0 }))}
                   className="h-5"
                 />
                 <span className="text-right text-sm font-medium text-neutral-400">1</span>
                 <div className="rounded-xl border border-border/80 bg-background/80 px-3 py-1.5 text-right text-sm font-semibold">
-                  {formatSliderValue(config.dualChargingProbability)}
+                  {formatSliderValue(config.dualChargerProbability)}
                 </div>
               </div>
             </div>

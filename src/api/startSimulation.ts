@@ -8,7 +8,7 @@ import { EnvelopeSchema } from './generated/api_pb';
 export type InitEngineConfig = {
   maximumEVs: number;
   seed: number;
-  dualChargingProbability: number;
+  dualChargerProbability: number;
   numberOfChargers: number;
   costWeights: {
     costId: number;

@@ -11,7 +11,7 @@ const key = import.meta.env.VITE_MAPTILER_KEY as string;
 
 const boundingBox: LatLngBoundsExpression = [
   [54.5, 8.0],
-  [57.8, 12.7],
+  [58, 12.7],
 ];
 
 export function MapView({ children, mapRef }: MapViewProps) {
@@ -19,7 +19,7 @@ export function MapView({ children, mapRef }: MapViewProps) {
     <div className="h-full w-full">
       <MapContainer
         ref={mapRef}
-        minZoom={8}
+        minZoom={7}
         maxZoom={18}
         style={{ height: '100%', width: '100%' }}
         bounds={boundingBox}
