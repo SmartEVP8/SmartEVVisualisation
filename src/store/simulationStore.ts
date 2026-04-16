@@ -34,6 +34,7 @@ export type ChargerState = {
   isActive: boolean;
   utilization: number;
   chargerId: number;
+  chargingEVs: EVInQueue[] // always 0-2 elements
   queue: EVInQueue[];
 };
 
@@ -118,7 +119,8 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       isActive: cs.isActive,
       utilization: cs.utilization,
       chargerId: cs.chargerId,
-      queue: cs.evsInQueue.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc }))
+      queue: cs.evsInQueue.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc })),
+      chargingEVs: cs.evsCharging.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc })),
     };
   });
 
@@ -134,20 +136,11 @@ export const dispatchWSEventAction = atom(
   null,
   (get, set, payload: Exclude<Envelope["payload"], { case: undefined }>) => {
     switch (payload.case) {
-      case "arrival":
-        //TODO: DELETE
-        break;
-      case "chargingEnd":
-        //TOOD: DELETE
-        break;
       case "stateUpdate":
         set(handleSimulationSnapshotAction, payload.value);
         break;
       case "stationStateResponse":
         set(handleUpdateStationState, payload.value);
-        break;
-      case "getStationSnapshot":
-        console.warn("Client received a client-only request type.");
         break;
       case "initEngineData":
         set(handleInitEngineDataAction, payload.value);

@@ -1,27 +1,11 @@
 import { dispatchWSEventAction, simulationStore } from "@/store/simulationStore.ts";
-import { fromBinary, toBinary, create } from "@bufbuild/protobuf";
-import { EnvelopeSchema, GetStationSnapshotSchema, type Envelope } from "./generated/api_pb";
+import { fromBinary } from "@bufbuild/protobuf";
+import { EnvelopeSchema, type Envelope } from "./generated/api_pb";
 
 // TODO : BASEURL SHOULD PROBABLY BE GLOBAL
 const WS_URL = "ws://localhost:5000/ws/simulation";
 
 let ws: WebSocket | null = null;
-
-export function sendGetStationSnapshot(stationId: number) {
-  if (!ws || ws.readyState !== WebSocket.OPEN) {
-    console.warn("WS not open, cannot send getStationSnapshot");
-    return;
-  }
-
-  const envelope = create(EnvelopeSchema, {
-    payload: {
-      case: "getStationSnapshot",
-      value: create(GetStationSnapshotSchema, { stationId: stationId }),
-    },
-  });
-
-  ws.send(toBinary(EnvelopeSchema, envelope));
-}
 
 export function startSimulationWS(): WebSocket {
   ws = new WebSocket(WS_URL);
@@ -46,10 +30,6 @@ export function startSimulationWS(): WebSocket {
           dispatchWSEventAction,
           envelope.payload as Exclude<Envelope["payload"], { case: undefined }>
         );
-
-        if (envelope.payload.case === "arrival" || envelope.payload.case === "chargingEnd") {
-          sendGetStationSnapshot(envelope.payload.value.stationId);
-        }
       }
     } catch (err) {
       console.error("Failed to parse WS message:", err);

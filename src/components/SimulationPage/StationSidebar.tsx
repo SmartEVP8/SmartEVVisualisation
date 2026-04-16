@@ -1,4 +1,4 @@
-import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X } from 'lucide-react';
+import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X, Zap } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
@@ -71,6 +71,7 @@ export function StationSidebar({
 
   const selectedChargerState = selectedChargerId !== null ? (chargerStates[selectedChargerId] ?? null) : null;
   const selectedQueueItems = selectedChargerState?.queue ?? [];
+  const selectedChargingEVs = selectedChargerState?.chargingEVs ?? [];
 
   return (
     <Card
@@ -123,7 +124,8 @@ export function StationSidebar({
           </div>
           <Separator orientation="vertical" className="bg-border/30" />
           {selectedChargerId !== null && (
-            <QueueSection
+            <ChargerDetailSection
+              chargingEVs={selectedChargingEVs}
               queueItems={selectedQueueItems}
               onClear={() => setSelectedChargerId(null)}
             />
@@ -237,6 +239,8 @@ type ChargerCardProps = {
 };
 
 function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCardProps) {
+  const chargingEVs = chargerState?.chargingEVs ?? [];
+
   const cardClass = [
     "relative cursor-pointer p-4 text-left transition-all duration-200",
     !isSelected && "hover:bg-muted/50 hover:border-border/70",
@@ -290,6 +294,29 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
               <span className="text-muted-foreground">Queue</span>
               <span className="font-medium">{chargerState?.queue?.length ?? 0}</span>
             </div>
+
+            {/* Charging EVs inline summary */}
+            {chargingEVs.length > 0 && (
+              <>
+                <Separator className="bg-border/40" />
+                <div className="space-y-2">
+                  {chargingEVs.map((ev) => (
+                    <div key={ev.id} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Zap className="h-3 w-3 text-yellow-500" />
+                          Vehicle {ev.id}
+                        </span>
+                        <span className="text-xs font-medium">
+                          {Math.round(ev.soc * 100)}% → {Math.round(ev.targetSoC * 100)}%
+                        </span>
+                      </div>
+                      <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -297,15 +324,19 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
   );
 }
 
-type QueueItemProps = {
-  ev: EVInQueue
+type EVCardProps = {
+  ev: EVInQueue;
+  isCharging?: boolean;
 };
 
-function QueueItem({ ev }: QueueItemProps) {
+function EVCard({ ev, isCharging = false }: EVCardProps) {
   return (
     <Card size="sm" variant="muted" className='gap-0'>
       <CardHeader className="px-0 mb-0 py-0 pb-2">
-        <p className="text-sm font-bold">Vehicle {ev.id}</p>
+        <div className="flex items-center gap-1.5">
+          {isCharging && <Zap className="h-3.5 w-3.5 shrink-0 text-yellow-500" />}
+          <p className="text-sm font-bold">Vehicle {ev.id}</p>
+        </div>
       </CardHeader>
       <CardContent className="px-0 mt-0 py-0">
         <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
@@ -314,18 +345,20 @@ function QueueItem({ ev }: QueueItemProps) {
   );
 }
 
-type QueueSectionProps = {
-  queueItems: { id: number; soc: number; targetSoC: number }[];
+type ChargerDetailSectionProps = {
+  chargingEVs: EVInQueue[];
+  queueItems: EVInQueue[];
   onClear: () => void;
 };
 
-function QueueSection({ queueItems, onClear }: QueueSectionProps) {
+function ChargerDetailSection({ chargingEVs, queueItems, onClear }: ChargerDetailSectionProps) {
   return (
     <div className="flex min-w-0 flex-1">
-      <div className="flex min-w-0 flex-1 flex-col pl-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 pl-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Queue for Charger
+            Charger Detail
           </p>
           <Button
             type="button"
@@ -338,17 +371,46 @@ function QueueSection({ queueItems, onClear }: QueueSectionProps) {
           </Button>
         </div>
 
-        {queueItems.length > 0 ? (
-          <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
-            {queueItems.map((ev) => (
-              <QueueItem key={ev.id} ev={ev} />
-            ))}
+        <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto">
+          {/* Currently Charging */}
+          <div>
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Zap className="h-3 w-3 text-yellow-500" />
+              Charging
+            </p>
+            {chargingEVs.length > 0 ? (
+              <div className="space-y-2">
+                {chargingEVs.map((ev) => (
+                  <EVCard key={ev.id} ev={ev} isCharging />
+                ))}
+              </div>
+            ) : (
+              <Card variant="muted" className="p-3">
+                <p className="text-xs text-muted-foreground">No vehicles charging</p>
+              </Card>
+            )}
           </div>
-        ) : (
-          <Card variant="muted" className="p-4">
-            <p className="text-xs text-muted-foreground">No vehicles waiting</p>
-          </Card>
-        )}
+
+          <Separator className="bg-border/30" />
+
+          {/* Queue */}
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Queue
+            </p>
+            {queueItems.length > 0 ? (
+              <div className="space-y-2">
+                {queueItems.map((ev) => (
+                  <EVCard key={ev.id} ev={ev} />
+                ))}
+              </div>
+            ) : (
+              <Card variant="muted" className="p-3">
+                <p className="text-xs text-muted-foreground">No vehicles waiting</p>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

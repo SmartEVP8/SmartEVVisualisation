@@ -52,6 +52,7 @@ message EVChargerState {
   int32 ev_id = 1;
   float soc = 2;
   float target_soc = 3;
+  int32 finish_time_ms = 4;
 }
 
 // Represents the state of a single charger.
@@ -60,7 +61,8 @@ message ChargerState {
   float utilization = 2;
   uint32 charger_id = 3;
   uint32 queue_size = 4;
-  repeated EVChargerState evs_in_queue = 5;
+  repeated EVChargerState evs_charging = 5;
+  repeated EVChargerState evs_in_queue = 6;
 }
 
 // Represents an EV currently on route to a station, including its waypoints
@@ -77,37 +79,14 @@ message StationState {
 }
 
 // ============================================================================
-// CLIENT REQUEST TYPES
-// ============================================================================
-
-// Request a snapshot of a specific station's state
-message GetStationSnapshot {
-  uint32 station_id = 1;
-}
-
-// ============================================================================
 // EVENT TYPES (Server -> Client pushes)
 // ============================================================================
-
-// ArrivalAtStation event trigger in the engine
-message ArrivalEvent {
-  uint32 station_id = 1;
-  int32 ev_id = 2;
-  uint64 timestamp_ms = 3;
-}
-
-// EndCharging event trigger in the engine
-message ChargingEndEvent {
-  uint32 station_id = 1;
-  int32 ev_id = 2;
-  uint64 timestamp_ms = 3;
-}
 
 // Periodic snapshot of the overall simulation state (e.g., every second)
 message SimulationSnapshot {
   uint32 total_evs = 1;
   uint32 total_charging = 2;
-  uint64 simulation_time_ms = 3;
+  uint32 simulation_time_ms = 3;
 }
 
 /*
@@ -119,16 +98,11 @@ message SimulationSnapshot {
 */
 message Envelope {
   oneof payload {
-    // Client Requests (10-19)
-    GetStationSnapshot get_station_snapshot = 10;
-
     // Server Responses (20-29)
-    InitEngineData init_engine_data = 20;
-    StationState station_state_response = 21; // response to GetStationSnapshot
+    InitEngineData init_engine_data = 10;
+    StationState station_state_response = 11; // response to GetStationSnapshot
 
     // Server Events/Pushes (30-39)
-    ArrivalEvent arrival = 30;
-    ChargingEndEvent charging_end = 31;
-    SimulationSnapshot state_update = 32;
+    SimulationSnapshot state_update = 20;
   }
 }
