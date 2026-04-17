@@ -2,7 +2,7 @@ import { dispatchWSEventAction, simulationStore } from '@/store/simulationStore'
 import { startSimulationWS } from '@/api/ws';
 import { fromBinary } from '@bufbuild/protobuf';
 import { apiPostBinary } from './client';
-import { EnvelopeSchema } from './generated/api_pb';
+import { EnvelopeSchema } from './generated/protocol/api_pb';
 
 
 export type InitEngineConfig = {
