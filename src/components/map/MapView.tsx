@@ -7,8 +7,6 @@ type MapViewProps = {
   mapRef?: Ref<LeafletMap | null>;
 };
 
-const key = import.meta.env.VITE_MAPTILER_KEY as string;
-
 const boundingBox: LatLngBoundsExpression = [
   [54.5, 8.0],
   [58, 12.7],
@@ -20,7 +18,7 @@ export function MapView({ children, mapRef }: MapViewProps) {
       <MapContainer
         ref={mapRef}
         minZoom={7}
-        maxZoom={18}
+        maxZoom={19}
         style={{ height: '100%', width: '100%' }}
         bounds={boundingBox}
         maxBounds={boundingBox}
@@ -28,13 +26,14 @@ export function MapView({ children, mapRef }: MapViewProps) {
         zoomControl={false}
       >
         <TileLayer
-          url={`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${key}`}
-          tileSize={512}
-          zoomOffset={-1}
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          maxNativeZoom={19}
+          maxZoom={19}
+          tileSize={256}
           noWrap
           updateWhenIdle={false}
           updateWhenZooming={false}
-          attribution="&copy; MapTiler &copy; OpenStreetMap contributors"
+          attribution="&copy; OpenStreetMap contributors &copy; CARTO"
         />
 
         {children}
