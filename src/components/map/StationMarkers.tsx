@@ -3,18 +3,35 @@ import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { stationsConfigAtom } from '@/store/simulationStore';
 import type { StationConfig } from '@/store/simulationStore';
-import { selectedStationAtom } from '@/store/uiStore';
+import {
+  selectedStationAtom,
+  selectedChargerIdAtom,
+} from '@/store/uiStore';
 import { StationMarker } from './StationMarker';
 
 function StationMarkersComponent() {
   const stationsConfig = useAtomValue(stationsConfigAtom);
+  const selectedChargerId = useAtomValue(selectedChargerIdAtom);
   const setSelectedStation = useSetAtom(selectedStationAtom);
+  const setSelectedChargerId = useSetAtom(selectedChargerIdAtom);
 
   const stationsArray = useMemo(() => Object.values(stationsConfig), [stationsConfig]);
 
   const handleSelect = useCallback(
-    (station: StationConfig) => setSelectedStation({ station }),
-    [setSelectedStation]
+    (station: StationConfig) => {
+      if (selectedChargerId !== null) {
+        setSelectedChargerId(null);
+
+        window.setTimeout(() => {
+          setSelectedStation({ station });
+        }, 300);
+
+        return;
+      }
+
+      setSelectedStation({ station });
+    },
+    [selectedChargerId, setSelectedChargerId, setSelectedStation]
   );
 
   return (

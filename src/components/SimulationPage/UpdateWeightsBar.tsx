@@ -1,13 +1,10 @@
 import * as Form from '@radix-ui/react-form';
-import { X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { Slider } from '../ui/slider';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { updateWeights } from '@/api/weights';
 import { weightMetadataAtom, setSingleWeightAction } from '@/store/weightStore';
 
@@ -21,13 +18,8 @@ type WeightValue = {
   value: number;
 };
 
-type UpdateWeightsSidebarProps = {
-  onClose: () => void;
-};
 
-export function UpdateWeightsSidebar({
-  onClose,
-}: UpdateWeightsSidebarProps) {
+export function UpdateWeightsSidebar() {
   const cachedWeights = useAtomValue(weightMetadataAtom);
 
   const [weightValues, setWeightValues] = useState<WeightValue[]>(() =>
@@ -65,7 +57,7 @@ export function UpdateWeightsSidebar({
   if (cachedWeights.length === 0) {
     return (
       <Card className={sidebarClassName}>
-        <WeightsSidebarHeader onClose={onClose} />
+        <WeightsSidebarHeader/>
 
         <div className="flex-1 p-5">
           <Card variant="muted" className="p-4">
@@ -80,7 +72,7 @@ export function UpdateWeightsSidebar({
 
   return (
     <Card className={sidebarClassName}>
-      <WeightsSidebarHeader onClose={onClose} />
+      <WeightsSidebarHeader/>
 
       <div className="flex flex-1 flex-col overflow-hidden p-5">
         <Form.Root className="flex h-full flex-col overflow-hidden">
@@ -112,13 +104,9 @@ export function UpdateWeightsSidebar({
   );
 }
 
-type WeightsSidebarHeaderProps = {
-  onClose: () => void;
-};
 
-function WeightsSidebarHeader({
-  onClose,
-}: WeightsSidebarHeaderProps) {
+
+function WeightsSidebarHeader() {
   return (
     <>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 p-3 pb-2">
@@ -127,22 +115,6 @@ function WeightsSidebarHeader({
             Adjust Weights
           </h2>
         </div>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              onClick={onClose}
-              className="h-10 w-10 rounded-full absolute top-4 right-4"
-              aria-label="Close sidebar"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Close sidebar</TooltipContent>
-        </Tooltip>
       </div>
       <Separator />
     </>

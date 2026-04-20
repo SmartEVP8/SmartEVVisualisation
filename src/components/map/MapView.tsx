@@ -1,6 +1,6 @@
 import type { LatLngBoundsExpression, Map as LeafletMap } from 'leaflet';
 import type { ReactNode, Ref } from 'react';
-import { MapContainer, TileLayer, ZoomControl, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 
 type MapViewProps = {
   children?: ReactNode;

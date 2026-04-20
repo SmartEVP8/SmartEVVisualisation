@@ -1,5 +1,5 @@
 import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X, Zap } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import { Badge } from '../ui/badge';
@@ -13,7 +13,8 @@ import {
   selectedStationAtom,
   isSidebarCollapsedAtom,
   clearSelectionAction,
-  isShowingRoutesAtom
+  isShowingRoutesAtom,
+  selectedChargerIdAtom
 } from '@/store/uiStore';
 import { chargersConfigAtom, evsOnRouteAtom, getChargerStatesAtom, type ChargerConfig, type ChargerState, type EVInQueue, type Position } from '@/store/simulationStore';
 
@@ -26,7 +27,7 @@ export function StationSidebar({
   onShowIncomingRoutes,
   onFocusStation,
 }: StationSidebarProps) {
-  const [selectedChargerId, setSelectedChargerId] = useState<number | null>(null);
+  const [selectedChargerId, setSelectedChargerId] = useAtom(selectedChargerIdAtom);
   const [isCollapsed, setIsCollapsed] = useAtom(isSidebarCollapsedAtom);
 
   const setIsShowingRoutes = useSetAtom(isShowingRoutesAtom);

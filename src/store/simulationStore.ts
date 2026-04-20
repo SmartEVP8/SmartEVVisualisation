@@ -107,10 +107,29 @@ export const handleInitEngineDataAction = atom(null, (get, set, payload: InitEng
 });
 
 
-export const handleSimulationSnapshotAction = atom(null, (get, set, payload: SimulationSnapshot) => {
-  set(simulationTimeAtom, Number(payload.simulationTimeMs));
-  set(globalStatsAtom, { totalEvs: payload.totalEvs, totalCharging: payload.totalCharging });
-});
+export const handleSimulationSnapshotAction = atom(
+  null,
+  (get, set, payload: SimulationSnapshot) => {
+    const incomingTime = Number(payload.simulationTimeMs);
+    const currentTime = get(simulationTimeAtom);
+
+    if (incomingTime < currentTime) {
+      console.warn('Ignoring stale simulation snapshot', {
+        incomingTime,
+        currentTime,
+        totalEvs: payload.totalEvs,
+        totalCharging: payload.totalCharging,
+      });
+      return;
+    }
+
+    set(simulationTimeAtom, incomingTime);
+    set(globalStatsAtom, {
+      totalEvs: payload.totalEvs,
+      totalCharging: payload.totalCharging,
+    });
+  }
+);
 
 export const handleUpdateStationState = atom(null, (get, set, payload: StationState) => {
   const stationChargerStates: Record<number, ChargerState> = {};

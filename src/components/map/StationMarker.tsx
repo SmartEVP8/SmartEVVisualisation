@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import React, { useCallback, useMemo } from 'react';
-import { BatteryCharging } from 'lucide-react';
+import { EvCharger } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Marker, useMap } from 'react-leaflet';
 import type { StationConfig } from '@/store/simulationStore';
@@ -15,7 +15,7 @@ type Props = {
 };
 
 const glyph = renderToStaticMarkup(
-  <BatteryCharging size={16} color="currentColor" strokeWidth={2.25} aria-hidden="true" />
+  <EvCharger  size={16} color="currentColor" strokeWidth={2.25} aria-hidden="true" />
 );
 
 function makeIcon(color: string) {
