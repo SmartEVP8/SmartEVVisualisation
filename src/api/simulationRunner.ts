@@ -50,4 +50,4 @@ export const pauseSimulation = () =>
   apiPost<SimulationResponse>('/simulation/pause');
 
 export const resumeSimulation = () =>
-  apiPost<SimulationResponse>('/simulation/unpause');
+  apiPost<SimulationResponse>('/simulation/resume');
