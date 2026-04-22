@@ -65,6 +65,7 @@ export const evsOnRouteAtom = atom<Record<number, EVOnRoute[]>>({});
 export const simulationTimeAtom = atom<number>(0);
 export const globalStatsAtom = atom({ totalEvs: 0, totalCharging: 0 });
 export const queueAlertsAtom = atom<Record<number, QueueAlert>>({});
+export const stationQueueLengthsAtom = atom<Record<number, number>>({});
 
 const chargerStateAtomCache = new Map<number, PrimitiveAtom<Record<number, ChargerState>>>();
 
@@ -105,6 +106,8 @@ export function getStationStatusAtom(stationId: number) {
 // --- Mutation Actions ---
 export const handleInitEngineDataAction = atom(null, (_get, set, payload: InitEngineData) => {
   const stationsRecord: Record<number, StationConfig> = {};
+  const initialQueuesRecord: Record<number, number> = {};
+
   for (const s of payload.stations) {
     stationsRecord[s.id] = {
       id: s.id,
@@ -114,6 +117,7 @@ export const handleInitEngineDataAction = atom(null, (_get, set, payload: InitEn
       },
       address: s.address,
     };
+    initialQueuesRecord[s.id] = 0;
   }
 
   const chargersRecord: Record<number, ChargerConfig> = {};
@@ -128,7 +132,8 @@ export const handleInitEngineDataAction = atom(null, (_get, set, payload: InitEn
 
   set(stationsConfigAtom, stationsRecord);
   set(chargersConfigAtom, chargersRecord);
-});
+  set(stationQueueLengthsAtom, initialQueuesRecord);
+});;
 
 export const handleSimulationSnapshotAction = atom(
   null,
@@ -181,6 +186,11 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
 
     totalQueueLength += queue.length;
   }
+
+  set(stationQueueLengthsAtom, (prev) => ({
+    ...prev,
+    [payload.stationId]: totalQueueLength,
+  }));
 
   set(getChargerStatesAtom(payload.stationId), stationChargerStates);
 

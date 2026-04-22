@@ -6,7 +6,6 @@ import { MapView } from '../components/map/MapView';
 import { StationMarkers } from '../components/map/StationMarkers';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
 import { Topbar } from '../components/SimulationPage/Topbar';
-import { UpdateWeightsSidebar } from '@/components/SimulationPage/UpdateWeightsBar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
 import { evsOnRouteAtom, type Position } from '@/store/simulationStore';
 import {
@@ -14,6 +13,7 @@ import {
   selectedStationAtom,
 } from '@/store/uiStore';
 import { CriticalQueueAlerts } from '@/components/SimulationPage/CriticalQueueAlerts';
+import OptionsSidebar from '@/components/SimulationPage/OptionSidebar';
 
 type RoutePoint = [number, number];
 
@@ -107,18 +107,8 @@ export function SimulationPage() {
           </div>
         </div>
       </div>
+      <OptionsSidebar onFocusStation={handleFocusPosition} />
 
-      <div className="group absolute top-4 left-4 z-[1200]">
-        {/* Invisible hover trigger */}
-        <div className="pointer-events-auto w-20 h-20" />
-
-        {/* Sidebar */}
-        <div className="pointer-events-none absolute top-0 left-0 pt-8 group-hover:pointer-events-auto">
-          <div className="-translate-x-4 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
-            <UpdateWeightsSidebar />
-          </div>
-        </div>
-      </div>
 
       {selectedStationPayload && (
         <StationSidebar
@@ -129,3 +119,4 @@ export function SimulationPage() {
     </div>
   );
 }
+
