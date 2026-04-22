@@ -14,8 +14,15 @@ type Props = {
   onSelect: (station: StationConfig) => void;
 };
 
+type MarkerWithStationMeta = L.Marker & {
+  options: L.MarkerOptions & {
+    stationStatus?: StationStatus;
+    stationId?: number;
+  };
+};
+
 const glyph = renderToStaticMarkup(
-  <EvCharger  size={16} color="currentColor" strokeWidth={2.25} aria-hidden="true" />
+  <EvCharger size={16} color="currentColor" strokeWidth={2.25} aria-hidden="true" />
 );
 
 function makeIcon(color: string) {
@@ -56,8 +63,19 @@ function StationMarkerComponent({ station, onSelect }: Props) {
     onSelect(station);
   }, [map, station, onSelect]);
 
+  const handleMarkerRef = useCallback(
+    (marker: MarkerWithStationMeta | null) => {
+      if (!marker) return;
+
+      marker.options.stationStatus = status;
+      marker.options.stationId = station.id;
+    },
+    [status, station.id]
+  );
+
   return (
     <Marker
+      ref={handleMarkerRef}
       position={[station.pos.lat, station.pos.lon]}
       icon={icon}
       eventHandlers={{

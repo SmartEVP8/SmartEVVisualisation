@@ -13,6 +13,7 @@ import {
   isShowingRoutesAtom,
   selectedStationAtom,
 } from '@/store/uiStore';
+import { CriticalQueueAlerts } from '@/components/SimulationPage/CriticalQueueAlerts';
 
 type RoutePoint = [number, number];
 
@@ -82,6 +83,8 @@ export function SimulationPage() {
             );
           })}
       </MapView>
+
+      <CriticalQueueAlerts />
 
       <div className="absolute top-2 left-1/2 z-[1200] -translate-x-1/2">
         <div className="group relative inline-block">
