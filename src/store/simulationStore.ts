@@ -28,6 +28,7 @@ export type EVInQueue = {
   id: number;
   soc: number;
   targetSoC: number;
+  finishTimeMs: number;
 };
 
 export type ChargerState = {
@@ -138,8 +139,8 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       isActive: cs.isActive,
       utilization: cs.utilization,
       chargerId: cs.chargerId,
-      queue: cs.evsInQueue.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc })),
-      chargingEVs: cs.evsCharging.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc })),
+      queue: cs.evsInQueue.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc, finishTimeMs: ev.finishTimeMs })),
+      chargingEVs: cs.evsCharging.map((ev) => ({ id: ev.evId, soc: ev.soc, targetSoC: ev.targetSoc, finishTimeMs: ev.finishTimeMs })),
     };
   });
 
