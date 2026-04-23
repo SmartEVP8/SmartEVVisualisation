@@ -1,15 +1,15 @@
 import L from 'leaflet';
-import React, { useMemo, useCallback } from 'react';
-import MarkerClusterGroup from 'react-leaflet-cluster';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import 'leaflet.markercluster';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { stationsConfigAtom } from '@/store/simulationStore';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
+import { useMap } from 'react-leaflet';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { EvCharger } from 'lucide-react';
+import { stationsConfigAtom, getStationStatusAtom } from '@/store/simulationStore';
 import type { StationConfig } from '@/store/simulationStore';
-import {
-  selectedStationAtom,
-  selectedChargerIdAtom,
-} from '@/store/uiStore';
-import { StationMarker, type StationStatus } from './StationMarker';
+import { selectedStationAtom, selectedChargerIdAtom } from '@/store/uiStore';
+
+export type StationStatus = 'idle' | 'busy' | 'full';
 
 type MarkerWithStationMeta = L.Marker & {
   options: L.MarkerOptions & {
@@ -39,6 +39,35 @@ const CLUSTER_COLOURS = {
 } as const;
 
 const clusterIconCache = new Map<string, L.DivIcon>();
+
+const glyph = renderToStaticMarkup(
+  <EvCharger size={16} color="currentColor" strokeWidth={2.25} aria-hidden="true" />
+);
+
+function makeIcon(color: string) {
+  return L.divIcon({
+    className: '',
+    html: `
+      <div style="position:relative;width:40px;height:52px;display:flex;align-items:center;justify-content:center;">
+        <div style="
+          position:absolute;inset:0;width:40px;height:52px;
+          background:${color};
+          clip-path:path('M20 52C20 52 0 30 0 20C0 8.954 8.954 0 20 0C31.046 0 40 8.954 40 20C40 30 20 52 20 52Z');
+        "></div>
+        <div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);width:16px;height:16px;color:#fff;z-index:2;">
+          ${glyph}
+        </div>
+      </div>`,
+    iconSize: [40, 52],
+    iconAnchor: [20, 52],
+  });
+}
+
+const STATION_ICONS: Record<StationStatus, L.DivIcon> = {
+  idle: makeIcon('#22c55e'),
+  busy: makeIcon('#f59e0b'),
+  full: makeIcon('#ef4444'),
+};
 
 function getStatusSeverity(status: StationStatus | undefined): 0 | 1 | 2 {
   switch (status) {
@@ -100,9 +129,8 @@ function buildClusterHtml(
         </div>
       </div>
 
-      ${
-        problematicCount > 0
-          ? `
+      ${problematicCount > 0
+      ? `
         <div style="
           position:absolute;
           top:-4px;
@@ -124,12 +152,11 @@ function buildClusterHtml(
           ${problematicCount}
         </div>
       `
-          : ''
-      }
+      : ''
+    }
 
-      ${
-        hasFull
-          ? `
+      ${hasFull
+      ? `
         <div style="
           position:absolute;
           bottom:-2px;
@@ -150,8 +177,8 @@ function buildClusterHtml(
           !
         </div>
       `
-          : ''
-      }
+      : ''
+    }
     </div>
   `;
 }
@@ -217,6 +244,8 @@ function createClusterCustomIcon(cluster: MarkerClusterLike) {
 }
 
 function StationMarkersComponent() {
+  const map = useMap();
+  const store = useStore();
   const stationsConfig = useAtomValue(stationsConfigAtom);
   const selectedChargerId = useAtomValue(selectedChargerIdAtom);
   const setSelectedStation = useSetAtom(selectedStationAtom);
@@ -226,41 +255,65 @@ function StationMarkersComponent() {
 
   const handleSelect = useCallback(
     (station: StationConfig) => {
+      map.flyTo([station.pos.lat, station.pos.lon], 18, { duration: 1.2 });
       if (selectedChargerId !== null) {
         setSelectedChargerId(null);
-
-        window.setTimeout(() => {
-          setSelectedStation({ station });
-        }, 300);
-
+        window.setTimeout(() => setSelectedStation({ station }), 300);
         return;
       }
-
       setSelectedStation({ station });
     },
-    [selectedChargerId, setSelectedChargerId, setSelectedStation]
+    [map, selectedChargerId, setSelectedChargerId, setSelectedStation]
   );
 
-  return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={50}
-      spiderfyOnMaxZoom
-      showCoverageOnHover={false}
-      iconCreateFunction={createClusterCustomIcon}
-      removeOutsideVisibleBounds
-      animate={false}
-      animateAddingMarkers={false}
-    >
-      {stationsArray.map((station) => (
-        <StationMarker
-          key={station.id}
-          station={station}
-          onSelect={handleSelect}
-        />
-      ))}
-    </MarkerClusterGroup>
-  );
+  useEffect(() => {
+    const clusterGroup = L.markerClusterGroup({
+      chunkedLoading: true,
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      iconCreateFunction: createClusterCustomIcon as any,
+      removeOutsideVisibleBounds: true,
+      animate: false,
+    });
+
+    const unsubs = new Set<() => void>();
+
+    stationsArray.forEach((station) => {
+      const statusAtom = getStationStatusAtom(station.id);
+      const initialStatus = store.get(statusAtom) as StationStatus;
+
+      const marker = L.marker([station.pos.lat, station.pos.lon], {
+        icon: STATION_ICONS[initialStatus],
+      }) as MarkerWithStationMeta;
+
+      marker.options.stationStatus = initialStatus;
+      marker.options.stationId = station.id;
+      marker.on('click', () => handleSelect(station));
+
+      clusterGroup.addLayer(marker);
+
+      const unsub = store.sub(statusAtom, () => {
+        const newStatus = store.get(statusAtom) as StationStatus;
+        if (marker.options.stationStatus === newStatus) return;
+
+        marker.options.stationStatus = newStatus;
+        marker.setIcon(STATION_ICONS[newStatus]);
+        clusterGroup.refreshClusters(marker);
+      });
+
+      unsubs.add(unsub);
+    });
+
+    map.addLayer(clusterGroup);
+
+    return () => {
+      unsubs.forEach((unsub) => unsub());
+      map.removeLayer(clusterGroup);
+    };
+  }, [map, store, stationsArray, handleSelect]);
+
+  return null;
 }
 
 export const StationMarkers = React.memo(StationMarkersComponent);
