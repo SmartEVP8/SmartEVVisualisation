@@ -12,7 +12,6 @@ import {
   isShowingRoutesAtom,
   selectedStationAtom,
 } from '@/store/uiStore';
-import { CriticalQueueAlerts } from '@/components/SimulationPage/CriticalQueueAlerts';
 import OptionsSidebar from '@/components/SimulationPage/OptionSidebar';
 
 type RoutePoint = [number, number];
@@ -20,7 +19,7 @@ type RoutePoint = [number, number];
 export function SimulationPage() {
   const mapRef = useRef<LeafletMap | null>(null);
   const [hasSimStarted, setHasSimStarted] = useState(false);
-  const [isTopbarPinned, setIsTopbarPinned] = useState(false);
+  const [isTopbarPinned, setIsTopbarPinned] = useState(true);
 
   const selectedStationPayload = useAtomValue(selectedStationAtom);
   const isShowingRoutes = useAtomValue(isShowingRoutesAtom);
@@ -83,9 +82,6 @@ export function SimulationPage() {
             );
           })}
       </MapView>
-
-      <CriticalQueueAlerts />
-
       <div className="absolute top-2 left-1/2 z-[1200] -translate-x-1/2">
         <div className="group relative inline-block">
           {!isTopbarPinned && (

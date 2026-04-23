@@ -55,7 +55,7 @@ export type QueueAlert = {
 
 export const simulationStore = createStore();
 
-const CRITICAL_QUEUE_THRESHOLD = 100;
+const CRITICAL_QUEUE_THRESHOLD = 10;
 
 // --- Static Atoms ---
 export const stationsConfigAtom = atom<Record<number, StationConfig>>({});

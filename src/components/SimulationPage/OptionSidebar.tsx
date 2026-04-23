@@ -2,7 +2,7 @@ import * as Form from '@radix-ui/react-form';
 import { useMemo, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Virtuoso } from 'react-virtuoso';
-import { SlidersHorizontalIcon, ClockAlert, CarFront, MapPin, Scale } from 'lucide-react';
+import { SlidersHorizontalIcon, ClockAlert, CarFront, MapPin, Scale, AlertTriangle, X } from 'lucide-react';
 
 import { Card } from '../ui/card';
 import { Label } from '../ui/label';
@@ -11,7 +11,7 @@ import { Button } from '../ui/button';
 
 import { updateWeights } from '@/api/weights';
 import { weightMetadataAtom, setSingleWeightAction } from '@/store/weightStore';
-import { stationQueueLengthsAtom, stationsConfigAtom } from "@/store/simulationStore";
+import { dismissQueueAlertAction, queueAlertsAtom, stationQueueLengthsAtom, stationsConfigAtom, type QueueAlert } from "@/store/simulationStore";
 
 function formatSliderValue(value: number) {
   return Number.isInteger(value) ? value.toString() : value.toFixed(1);
@@ -198,7 +198,71 @@ export function QueuesSidebar({ onFocusStation }: QueuesSidebarProps) {
   );
 }
 
-type SidebarItems = "weights" | "queues";
+
+
+export function CriticalQueueAlerts() {
+  const alerts = useAtomValue(queueAlertsAtom);
+  const dismissAlert = useSetAtom(dismissQueueAlertAction);
+  const activeAlerts = Object.values(alerts).sort((a, b) => b.queueLength - a.queueLength);
+
+  const RenderAlert = ({ alert }: { alert: QueueAlert }) => (
+    <div
+      key={alert.stationId}
+      className="flex items-start justify-between gap-3 rounded-lg border border-red-500/30 bg-red-950/80 px-4 py-3 text-red-100"
+    >
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs font-semibold text-red-300 uppercase tracking-wide">
+            Critical Queue
+          </span>
+          <span className="text-sm font-medium">{alert.address}</span>
+          <span className="text-xs text-red-300/80">
+            {alert.queueLength} EVs waiting
+          </span>
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 shrink-0 text-red-400 hover:bg-red-900/60 hover:text-white"
+        onClick={() => dismissAlert(alert.stationId)}
+      >
+        <X className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  )
+
+  return (
+    <Card className="flex flex-col w-100 h-[60vh] overflow-hidden pointer-events-auto shadow-lg bg-card/95 backdrop-blur-sm border-border/50">
+      <div className="flex items-center gap-2 border-b border-border/50 p-5 shrink-0">
+        <AlertTriangle className="w-5 h-5 text-primary" />
+        <h3 className="font-semibold text-lg tracking-tight">Notifications</h3>
+        {activeAlerts.length > 0 && (
+          <span className="ml-auto text-xs font-semibold bg-red-500 text-white rounded-full px-2 py-0.5">
+            {activeAlerts.length}
+          </span>
+        )}
+      </div>
+
+      {activeAlerts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center flex-1 gap-3 text-muted-foreground">
+          <div className="rounded-full bg-muted/50 p-4">
+            <AlertTriangle className="w-6 h-6 opacity-30" />
+          </div>
+          <p className="text-sm font-medium">All clear</p>
+          <p className="text-xs opacity-50">No critical alerts right now</p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto no-scrollbar px-4 flex flex-col gap-2">
+          {activeAlerts.map((alert) => <RenderAlert alert={alert} />)}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+type SidebarItems = "weights" | "queues" | "notifications";
 
 type SidebarProps = {
   onFocusStation: (lat: number, lon: number) => void;
@@ -210,6 +274,7 @@ export default function OptionsSidebar({ onFocusStation }: SidebarProps) {
   const selectedComponent = () => {
     if (selectedSidebarItem === "weights") return <UpdateWeightsSidebar />;
     if (selectedSidebarItem === "queues") return <QueuesSidebar onFocusStation={onFocusStation} />;
+    if (selectedSidebarItem === "notifications") return <CriticalQueueAlerts />;
     return null;
   };
 
@@ -233,6 +298,14 @@ export default function OptionsSidebar({ onFocusStation }: SidebarProps) {
           onClick={() => setSelectedSidebarItem(prev => prev === "queues" ? null : "queues")}
         >
           <ClockAlert className="w-5 h-5" />
+        </Button>
+        <Button
+          variant={selectedSidebarItem === "notifications" ? "default" : "ghost"}
+          size="icon"
+          className="transition-colors"
+          onClick={() => setSelectedSidebarItem(prev => prev === "notifications" ? null : "notifications")}
+        >
+          <AlertTriangle className="w-5 h-5" />
         </Button>
       </Card>
 
