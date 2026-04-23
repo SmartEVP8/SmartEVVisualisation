@@ -19,7 +19,6 @@ type RoutePoint = [number, number];
 export function SimulationPage() {
   const mapRef = useRef<LeafletMap | null>(null);
   const [hasSimStarted, setHasSimStarted] = useState(false);
-  const [isTopbarPinned, setIsTopbarPinned] = useState(true);
 
   const selectedStationPayload = useAtomValue(selectedStationAtom);
   const isShowingRoutes = useAtomValue(isShowingRoutesAtom);
@@ -54,7 +53,7 @@ export function SimulationPage() {
     return (
       <div className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
         <MapView mapRef={mapRef} />
-        <div className="absolute inset-0 z-[1100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="absolute inset-0 z-1100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <SimulationSetupForm closeOnSimulationStart={setHasSimStarted} />
         </div>
       </div>
@@ -82,26 +81,8 @@ export function SimulationPage() {
             );
           })}
       </MapView>
-      <div className="absolute top-2 left-1/2 z-[1200] -translate-x-1/2">
-        <div className="group relative inline-block">
-          {!isTopbarPinned && (
-            <div className="absolute inset-x-0 -top-2 h-16" />
-          )}
-
-          <div
-            className={[
-              'transition-all duration-200 ease-out',
-              isTopbarPinned
-                ? 'pointer-events-auto translate-y-0 opacity-100'
-                : 'pointer-events-none -translate-y-4 opacity-0 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100',
-            ].join(' ')}
-          >
-            <Topbar
-              isPinned={isTopbarPinned}
-              onTogglePin={() => setIsTopbarPinned((prev) => !prev)}
-            />
-          </div>
-        </div>
+      <div className="absolute top-2 left-1/2 z-1200 -translate-x-1/2">
+        <Topbar />
       </div>
       <OptionsSidebar onFocusStation={handleFocusPosition} />
 
