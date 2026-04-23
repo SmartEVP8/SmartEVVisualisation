@@ -28,6 +28,7 @@ export type EVInQueue = {
   id: number;
   soc: number;
   targetSoC: number;
+  finishTimeMs: number;
 };
 
 export type ChargerState = {
@@ -133,7 +134,7 @@ export const handleInitEngineDataAction = atom(null, (_get, set, payload: InitEn
   set(stationsConfigAtom, stationsRecord);
   set(chargersConfigAtom, chargersRecord);
   set(stationQueueLengthsAtom, initialQueuesRecord);
-});;
+});
 
 export const handleSimulationSnapshotAction = atom(
   null,
@@ -168,12 +169,14 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       id: ev.evId,
       soc: ev.soc,
       targetSoC: ev.targetSoc,
+      finishTimeMs: ev.finishTimeMs,
     }));
 
     const chargingEVs: EVInQueue[] = cs.evsCharging.map((ev) => ({
       id: ev.evId,
       soc: ev.soc,
       targetSoC: ev.targetSoc,
+      finishTimeMs: ev.finishTimeMs,
     }));
 
     stationChargerStates[cs.chargerId] = {
