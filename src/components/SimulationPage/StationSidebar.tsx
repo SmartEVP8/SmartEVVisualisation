@@ -1,8 +1,7 @@
-import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X } from 'lucide-react';
-import { useState } from 'react';
-import type { ChargerState } from '../../types/chargerState';
-import { fakeEVChargerStates } from '../../types/chargerState';
-import type { Charger, Station } from '../../types/station';
+import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Clock, Crosshair, Plug, Road, X, Zap } from 'lucide-react';
+import { useMemo } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { ButtonGroup } from '../ui/button-group';
@@ -10,98 +9,97 @@ import { Card, CardContent, CardHeader } from '../ui/card';
 import { Separator } from '../ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { TargetChargeDisplay } from './TargetChargeDisplay';
+import {
+  selectedStationAtom,
+  isSidebarCollapsedAtom,
+  clearSelectionAction,
+  isShowingRoutesAtom,
+  selectedChargerIdAtom
+} from '@/store/uiStore';
+import { chargersConfigAtom, evsOnRouteAtom, getChargerStatesAtom, type ChargerConfig, type ChargerState, type EVInQueue, type Position } from '@/store/simulationStore';
+import { msToPrettyDisplay } from '@/lib/msToPrettyDisplay';
 
 type StationSidebarProps = {
-  selectedStation: {
-    station: Station;
-    chargers: Charger[];
-  };
-  chargerStatesByChargerId: Map<number, ChargerState>;
-  onClose: () => void;
-  onShowIncomingRoutes: () => void;
-  onFocusStation: () => void;
-  isCollapsed: boolean;
-  onToggleCollapsed: () => void;
+  onShowIncomingRoutes: (points: Position[]) => void;
+  onFocusStation: (lat: number, lon: number) => void;
 };
 
 export function StationSidebar({
-  selectedStation,
-  chargerStatesByChargerId,
-  onClose,
   onShowIncomingRoutes,
   onFocusStation,
-  isCollapsed,
-  onToggleCollapsed,
 }: StationSidebarProps) {
-  const [selectedChargerSelection, setSelectedChargerSelection] = useState<{
-    stationId: number;
-    chargerId: number;
-  } | null>(null);
+  const [selectedChargerId, setSelectedChargerId] = useAtom(selectedChargerIdAtom);
+  const [isCollapsed, setIsCollapsed] = useAtom(isSidebarCollapsedAtom);
 
-  const selectedChargerId =
-    selectedChargerSelection?.stationId === selectedStation.station.id
-      ? selectedChargerSelection.chargerId
-      : null;
+  const setIsShowingRoutes = useSetAtom(isShowingRoutesAtom);
+  const clearSelection = useSetAtom(clearSelectionAction);
+
+  const selectedStation = useAtomValue(selectedStationAtom);
+  const chargersConfig = useAtomValue(chargersConfigAtom);
+  const selectedStationId = selectedStation?.station.id ?? -1;
+  const chargerStates = useAtomValue(
+    useMemo(() => getChargerStatesAtom(selectedStationId), [selectedStationId])
+  );
+  const evsOnRoute = useAtomValue(evsOnRouteAtom);
+
+  const stationChargers = useMemo(() => {
+    if (!selectedStation) return [];
+    return Object.values(chargersConfig).filter(
+      (charger) => charger.stationId === selectedStation.station.id
+    );
+  }, [chargersConfig, selectedStation]);
+
+  if (!selectedStation) return null;
+  const station = selectedStation.station;
 
   const sidebarWidthClass = selectedChargerId === null ? 'w-[26rem]' : 'w-[40rem]';
 
   const handleClose = () => {
-    setSelectedChargerSelection(null);
-    onClose();
+    setSelectedChargerId(null);
+    clearSelection();
   };
 
-  const toggleChargerSelection = (chargerId: number) => {
-    const isSameChargerSelected =
-      selectedChargerSelection?.stationId === selectedStation.station.id &&
-      selectedChargerSelection.chargerId === chargerId;
+  const toggleChargerSelection = (chargerId: number) =>
+    setSelectedChargerId((current) => (current === chargerId ? null : chargerId));
 
-    if (isSameChargerSelected) {
-      setSelectedChargerSelection(null);
-      return;
-    }
+  const handleFocus = () => onFocusStation(station.pos.lat, station.pos.lon);
 
-    setSelectedChargerSelection({
-      stationId: selectedStation.station.id,
-      chargerId,
-    });
+  const handleShowRoutes = () => {
+    setIsShowingRoutes(true);
+    const routes = evsOnRoute[station.id] || [];
+    const points = routes.flatMap(r => r.waypoints);
+    onShowIncomingRoutes(points);
   };
 
-  const selectedChargerState = selectedChargerId !== null
-    ? chargerStatesByChargerId.get(selectedChargerId)
-    : null;
-
-  const selectedQueueItems = selectedChargerState?.evsInQueue && selectedChargerState.evsInQueue.length > 0
-    ? selectedChargerState.evsInQueue
-    : fakeEVChargerStates;
+  const selectedChargerState = selectedChargerId !== null ? (chargerStates[selectedChargerId] ?? null) : null;
+  const selectedQueueItems = selectedChargerState?.queue ?? [];
+  const selectedChargingEVs = selectedChargerState?.chargingEVs ?? [];
 
   return (
     <Card
       className={`
-        absolute top-6 right-6 bottom-6 z-400
+        absolute top-6 right-6 bottom-6 z-[400]
         flex ${sidebarWidthClass} flex-col overflow-hidden
         transition-all duration-200
         ${isCollapsed ? 'translate-x-[calc(100%-4.25rem)] opacity-100' : 'translate-x-0 opacity-100'}
       `}
     >
       <StationSidebarHeader
-        title={selectedStation.station.address}
+        title={station.address}
         isCollapsed={isCollapsed}
-        onToggleCollapsed={onToggleCollapsed}
-        onFocusStation={onFocusStation}
-        onShowIncomingRoutes={onShowIncomingRoutes}
+        onToggleCollapsed={() => setIsCollapsed(!isCollapsed)}
+        onFocusStation={handleFocus}
+        onShowIncomingRoutes={handleShowRoutes}
         onClose={handleClose}
       />
 
       <StationStats
-        chargers={selectedStation.chargers}
-        chargerStatesByChargerId={chargerStatesByChargerId}
+        chargers={stationChargers}
+        chargerStates={chargerStates}
       />
 
       <div
-        className={`flex flex-1 flex-col gap-4 overflow-hidden p-5 transition-opacity duration-200 ${
-          isCollapsed ? 'pointer-events-none opacity-20' : 'opacity-100'
-        }`}
-      >
+        className={`flex flex-1 flex-col gap-4 overflow-hidden p-5 transition-opacity duration-200 ${isCollapsed ? 'pointer-events-none opacity-20' : 'opacity-100'}`}>
         <div className="flex flex-1 gap-4 overflow-hidden">
           <div className="flex min-w-0 flex-1 flex-col">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -111,8 +109,8 @@ export function StationSidebar({
               Click a charger card to view queue details.
             </p>
             <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
-              {selectedStation.chargers.map((charger) => {
-                const chargerState = chargerStatesByChargerId.get(charger.id) ?? null;
+              {stationChargers.map((charger) => {
+                const chargerState = chargerStates[charger.id] ?? null;
 
                 return (
                   <ChargerCard
@@ -128,17 +126,19 @@ export function StationSidebar({
           </div>
           <Separator orientation="vertical" className="bg-border/30" />
           {selectedChargerId !== null && (
-            <QueueSection
+            <ChargerDetailSection
+              chargingEVs={selectedChargingEVs}
               queueItems={selectedQueueItems}
-              onClear={() => setSelectedChargerSelection(null)}
+              onClear={() => setSelectedChargerId(null)}
             />
           )}
         </div>
       </div>
     </Card>
   );
-
 }
+
+// --- Subcomponents ---
 
 type StationSidebarHeaderProps = {
   title: string;
@@ -234,13 +234,15 @@ function StationSidebarHeader({
 }
 
 type ChargerCardProps = {
-  charger: Charger;
+  charger: ChargerConfig;
   chargerState: ChargerState | null;
   isSelected: boolean;
   onSelect: (chargerId: number) => void;
 };
 
 function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCardProps) {
+  const chargingEVs = chargerState?.chargingEVs ?? [];
+
   const cardClass = [
     "relative cursor-pointer p-4 text-left transition-all duration-200",
     !isSelected && "hover:bg-muted/50 hover:border-border/70",
@@ -259,12 +261,7 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
         }
       }}
     >
-      <Card
-        size="sm"
-        variant="muted"
-        selected={isSelected}
-        className={cardClass}
-      >
+      <Card size="sm" variant="muted" selected={isSelected} className={cardClass}>
         <CardHeader className="px-0 py-0 pb-2 relative z-20">
           <div className="flex items-center justify-between gap-2">
             <h3 className="min-w-0 flex-1 truncate text-sm font-bold">Charger {charger.id}</h3>
@@ -297,9 +294,32 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
 
             <div className="flex justify-between">
               <span className="text-muted-foreground">Queue</span>
-              <span className="font-medium">{chargerState?.queueSize ?? 0}</span>
+              <span className="font-medium">{chargerState?.queue?.length ?? 0}</span>
             </div>
 
+            {/* Charging EVs inline summary */}
+            {chargingEVs.length > 0 && (
+              <>
+                <Separator className="bg-border/40" />
+                <div className="space-y-2">
+                  {chargingEVs.map((ev) => (
+                    <div key={ev.id} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Zap className="h-3 w-3 text-yellow-500" />
+                          Vehicle {ev.id}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          {msToPrettyDisplay(ev.finishTimeMs)}
+                        </span>
+                      </div>
+                      <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -307,35 +327,45 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
   );
 }
 
-type QueueItemProps = {
-  ev: ChargerState['evsInQueue'][0];
+type EVCardProps = {
+  ev: EVInQueue;
+  isCharging?: boolean;
 };
 
-function QueueItem({ ev }: QueueItemProps) {
+function EVCard({ ev, isCharging = false }: EVCardProps) {
   return (
     <Card size="sm" variant="muted" className='gap-0'>
       <CardHeader className="px-0 mb-0 py-0 pb-2">
-        <p className="text-sm font-bold">Vehicle {ev.evID}</p>
+        <div className="flex items-center gap-1.5">
+          {isCharging && <Zap className="h-3.5 w-3.5 shrink-0 text-yellow-500" />}
+          <p className="text-sm font-bold">Vehicle {ev.id}</p>
+        </div>
+        <span className="flex items-center gap-1 text-muted-foreground">
+          <Clock className="h-3 w-3 text-muted-foreground" />
+          {msToPrettyDisplay(ev.finishTimeMs)}
+        </span>
       </CardHeader>
       <CardContent className="px-0 mt-0 py-0">
-        <TargetChargeDisplay soc={ev.SoC} targetSoC={ev.targetSoC} />
+        <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
       </CardContent>
     </Card>
   );
 }
 
-type QueueSectionProps = {
-  queueItems: ChargerState['evsInQueue'];
+type ChargerDetailSectionProps = {
+  chargingEVs: EVInQueue[];
+  queueItems: EVInQueue[];
   onClear: () => void;
 };
 
-function QueueSection({ queueItems, onClear }: QueueSectionProps) {
+function ChargerDetailSection({ chargingEVs, queueItems, onClear }: ChargerDetailSectionProps) {
   return (
     <div className="flex min-w-0 flex-1">
-      <div className="flex min-w-0 flex-1 flex-col pl-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 pl-4 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Queue for Charger
+            Charger Detail
           </p>
           <Button
             type="button"
@@ -348,40 +378,62 @@ function QueueSection({ queueItems, onClear }: QueueSectionProps) {
           </Button>
         </div>
 
-        {queueItems.length > 0 ? (
-          <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto">
-            {queueItems.map((ev) => (
-              <QueueItem key={ev.evID} ev={ev} />
-            ))}
+        <div className="no-scrollbar flex-1 space-y-4 overflow-y-auto">
+          {/* Currently Charging */}
+          <div>
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Zap className="h-3 w-3 text-yellow-500" />
+              Charging
+            </p>
+            {chargingEVs.length > 0 ? (
+              <div className="space-y-2">
+                {chargingEVs.map((ev) => (
+                  <EVCard key={ev.id} ev={ev} isCharging />
+                ))}
+              </div>
+            ) : (
+              <Card variant="muted" className="p-3">
+                <p className="text-xs text-muted-foreground">No vehicles charging</p>
+              </Card>
+            )}
           </div>
-        ) : (
-          <Card variant="muted" className="p-4">
-            <p className="text-xs text-muted-foreground">No vehicles waiting</p>
-          </Card>
-        )}
+
+          <Separator className="bg-border/30" />
+
+          {/* Queue */}
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Queue
+            </p>
+            {queueItems.length > 0 ? (
+              <div className="space-y-2">
+                {queueItems.map((ev) => (
+                  <EVCard key={ev.id} ev={ev} />
+                ))}
+              </div>
+            ) : (
+              <Card variant="muted" className="p-3">
+                <p className="text-xs text-muted-foreground">No vehicles waiting</p>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
 type StationStatsProps = {
-  chargers: Charger[];
-  chargerStatesByChargerId: Map<number, ChargerState>;
+  chargers: ChargerConfig[];
+  chargerStates: Record<number, ChargerState>;
 };
 
 function StationStats({
   chargers,
-  chargerStatesByChargerId,
+  chargerStates,
 }: StationStatsProps) {
-  const activeCount = chargers.filter((charger) =>
-    chargerStatesByChargerId.get(charger.id)?.isActive
-  ).length;
-
-  const queueCount = chargers.reduce(
-    (sum, charger) => sum + (chargerStatesByChargerId.get(charger.id)?.queueSize ?? 0),
-    0
-  );
-
+  const activeCount = chargers.filter((charger) => chargerStates[charger.id]?.isActive).length;
+  const queueCount = chargers.reduce((sum, charger) => sum + (chargerStates[charger.id]?.queue?.length ?? 0), 0);
   const dualCount = chargers.filter((charger) => charger.isDual).length;
 
   return (
@@ -410,6 +462,3 @@ function StationStats({
     </>
   );
 }
-
-
-

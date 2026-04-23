@@ -1,75 +1,40 @@
 import type { Map as LeafletMap } from 'leaflet';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { Polyline } from 'react-leaflet';
 import { MapView } from '../components/map/MapView';
 import { StationMarkers } from '../components/map/StationMarkers';
-import { Polyline } from 'react-leaflet';
 import { StationSidebar } from '../components/SimulationPage/StationSidebar';
+import { Topbar } from '../components/SimulationPage/Topbar';
 import { SimulationSetupForm } from '../components/SimulationSetup/SimulationSetupForm';
-import { StartSimulationButton } from '../components/SimulationSetup/StartSimulationButton';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { useSimulationPageController } from '../hooks/useSimulationPageController';
+import { evsOnRouteAtom, type Position } from '@/store/simulationStore';
+import {
+  isShowingRoutesAtom,
+  selectedStationAtom,
+} from '@/store/uiStore';
+import OptionsSidebar from '@/components/SimulationPage/OptionSidebar';
 
 type RoutePoint = [number, number];
-type MockIncomingRoute = { evId: number; waypoints: RoutePoint[] };
 
 export function SimulationPage() {
   const mapRef = useRef<LeafletMap | null>(null);
+  const [hasSimStarted, setHasSimStarted] = useState(false);
 
-  const {
-    simulation,
-    setup,
-    selection,
-    panel,
-  } = useSimulationPageController();
+  const selectedStationPayload = useAtomValue(selectedStationAtom);
+  const isShowingRoutes = useAtomValue(isShowingRoutesAtom);
+  const evsOnRoute = useAtomValue(evsOnRouteAtom);
 
-  const mockIncomingRoutes = useMemo(() => {
-    if (!selection.selectedStation) {
-      return [] as MockIncomingRoute[];
-    }
+  const incomingRoutes = useMemo(() => {
+    if (!selectedStationPayload) return [];
+    return evsOnRoute[selectedStationPayload.station.id] || [];
+  }, [selectedStationPayload, evsOnRoute]);
 
-    const { lat, lon } = selection.selectedStation.station.pos;
+  const handleShowIncomingRoutes = (points: Position[]) => {
+    const mapped = points.map((point) => [point.lat, point.lon] as RoutePoint);
 
-    return [
-      {
-        evId: 9001,
-        waypoints: [
-          [lat + 0.065, lon - 0.08] as RoutePoint,
-          [lat + 0.035, lon - 0.045] as RoutePoint,
-          [lat + 0.012, lon - 0.012] as RoutePoint,
-          [lat, lon] as RoutePoint,
-        ],
-      },
-      {
-        evId: 9002,
-        waypoints: [
-          [lat - 0.055, lon + 0.06] as RoutePoint,
-          [lat - 0.03, lon + 0.03] as RoutePoint,
-          [lat - 0.012, lon + 0.01] as RoutePoint,
-          [lat, lon] as RoutePoint,
-        ],
-      },
-      {
-        evId: 9003,
-        waypoints: [
-          [lat + 0.02, lon + 0.09] as RoutePoint,
-          [lat + 0.012, lon + 0.05] as RoutePoint,
-          [lat + 0.006, lon + 0.02] as RoutePoint,
-          [lat, lon] as RoutePoint,
-        ],
-      },
-    ] as MockIncomingRoute[];
-  }, [selection.selectedStation]);
+    if (mapped.length <= 2) return;
 
-
-  const handleShowIncomingRoutes = () => {
-    const routePoints = mockIncomingRoutes.flatMap((route) => route.waypoints);
-
-    panel.collapse();
-    if (routePoints.length === 0) {
-      return;
-    }
-
-    mapRef.current?.fitBounds(routePoints, {
+    mapRef.current?.fitBounds(mapped, {
       padding: [40, 40],
       maxZoom: 14,
       animate: true,
@@ -77,93 +42,58 @@ export function SimulationPage() {
     });
   };
 
-  const handleFocusStation = () => {
-    if (!selection.selectedStation) {
-      return;
-    }
-
-    const { lat, lon } = selection.selectedStation.station.pos;
-
+  const handleFocusPosition = (lat: number, lon: number) => {
     mapRef.current?.flyTo([lat, lon], 18, {
       animate: true,
       duration: 0.7,
     });
   };
 
+  if (!hasSimStarted) {
+    return (
+      <div className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
+        <MapView mapRef={mapRef} />
+        <div className="absolute inset-0 z-1100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <SimulationSetupForm closeOnSimulationStart={setHasSimStarted} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden">
+    <div className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
       <MapView mapRef={mapRef}>
-        <StationMarkers
-          hasStarted={simulation.hasStarted}
-          stations={simulation.stations}
-          chargersByStationId={simulation.chargersByStationId}
-          onSelect={selection.selectStation}
-        />
+        <StationMarkers />
 
-        {panel.isShowingRoutes && selection.selectedStation &&
-          mockIncomingRoutes.map((route) => {
-            const routePositions = route.waypoints;
-
-            if (routePositions.length === 0) {
-              return null;
-            }
+        {isShowingRoutes &&
+          selectedStationPayload &&
+          incomingRoutes.map((route) => {
+            if (route.waypoints.length === 0) return null;
 
             return (
               <Polyline
-                key={`route-${route.evId}`}
-                positions={routePositions}
+                key={`route-${route.id}`}
+                positions={route.waypoints.map(
+                  (waypoint) => [waypoint.lat, waypoint.lon] as RoutePoint
+                )}
                 pathOptions={{ color: '#22d3ee', weight: 4, opacity: 0.85 }}
               />
             );
           })}
       </MapView>
-
-      <div className="absolute top-4 left-4 z-1000 w-70">
-        {!simulation.hasStarted && (
-          <StartSimulationButton
-            onOpen={setup.openModal}
-            disabled={setup.isLoadingWeights || simulation.isStarting}
-          />
-        )}
-
-        {setup.weightsError && !setup.isModalOpen && (
-          <Alert variant="destructive" className="mt-3">
-            <AlertDescription>{setup.weightsError}</AlertDescription>
-          </Alert>
-        )}
-
-        {simulation.error && !setup.isModalOpen && (
-          <Alert variant="destructive" className="mt-3">
-            <AlertDescription>{simulation.error}</AlertDescription>
-          </Alert>
-        )}
-
-  
-
+      <div className="absolute top-2 left-1/2 z-1200 -translate-x-1/2">
+        <Topbar />
       </div>
+      <OptionsSidebar onFocusStation={handleFocusPosition} />
 
-      {setup.isModalOpen && (
-        <div className="absolute inset-0 z-1100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <SimulationSetupForm
-            onClose={setup.closeModal}
-            weightMetadata={setup.weightMetadata}
-            initialCostWeights={setup.initialCostWeights}
-            onStart={simulation.start}
-          />
-        </div>
-      )}
 
-      {simulation.hasStarted && selection.selectedStation && (
+      {selectedStationPayload && (
         <StationSidebar
-          selectedStation={selection.selectedStation}
-          chargerStatesByChargerId={simulation.chargerStatesByChargerId}
-          onClose={selection.clearSelection}
           onShowIncomingRoutes={handleShowIncomingRoutes}
-          onFocusStation={handleFocusStation}
-          isCollapsed={panel.isSidebarCollapsed}
-          onToggleCollapsed={panel.toggleSidebarCollapsed}
+          onFocusStation={handleFocusPosition}
         />
       )}
     </div>
   );
 }
+

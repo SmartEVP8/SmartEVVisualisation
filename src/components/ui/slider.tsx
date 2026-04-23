@@ -1,9 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { Slider as SliderPrimitive } from "radix-ui"
+import { Slider as SliderPrimitive } from "radix-ui";
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Slider({
   className,
@@ -13,15 +13,11 @@ function Slider({
   max = 100,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root>) {
-  const _values = React.useMemo(
-    () =>
-      Array.isArray(value)
-        ? value
-        : Array.isArray(defaultValue)
-          ? defaultValue
-          : [min, max],
-    [value, defaultValue, min, max]
-  )
+  const _values = Array.isArray(value)
+    ? value
+    : Array.isArray(defaultValue)
+      ? defaultValue
+      : [min, max];
 
   return (
     <SliderPrimitive.Root
@@ -56,4 +52,5 @@ function Slider({
   )
 }
 
-export { Slider }
+export { Slider };
+

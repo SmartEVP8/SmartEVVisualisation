@@ -14,13 +14,13 @@ export async function apiGet<T>(path: string): Promise<T> {
 
 
 // Generic POST request function that sends JSON and returns a typed response
-export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -50,4 +50,26 @@ export async function apiPostBinary(
 
   const arrayBuffer = await response.arrayBuffer();
   return new Uint8Array(arrayBuffer);
+}
+
+export async function ApiPatch<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+  }
+
+  const text = await response.text();
+
+  if (!text) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }
