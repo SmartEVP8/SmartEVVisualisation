@@ -1,5 +1,5 @@
-import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Crosshair, Plug, Road, X, Zap } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Battery, BatteryCharging, CheckCircle2, ChevronLeft, ChevronRight, Clock, Crosshair, Plug, Road, X, Zap } from 'lucide-react';
+import { useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import { Badge } from '../ui/badge';
@@ -13,9 +13,11 @@ import {
   selectedStationAtom,
   isSidebarCollapsedAtom,
   clearSelectionAction,
-  isShowingRoutesAtom
+  isShowingRoutesAtom,
+  selectedChargerIdAtom
 } from '@/store/uiStore';
 import { chargersConfigAtom, evsOnRouteAtom, getChargerStatesAtom, type ChargerConfig, type ChargerState, type EVInQueue, type Position } from '@/store/simulationStore';
+import { msToPrettyDisplay } from '@/lib/msToPrettyDisplay';
 
 type StationSidebarProps = {
   onShowIncomingRoutes: (points: Position[]) => void;
@@ -26,7 +28,7 @@ export function StationSidebar({
   onShowIncomingRoutes,
   onFocusStation,
 }: StationSidebarProps) {
-  const [selectedChargerId, setSelectedChargerId] = useState<number | null>(null);
+  const [selectedChargerId, setSelectedChargerId] = useAtom(selectedChargerIdAtom);
   const [isCollapsed, setIsCollapsed] = useAtom(isSidebarCollapsedAtom);
 
   const setIsShowingRoutes = useSetAtom(isShowingRoutesAtom);
@@ -307,8 +309,9 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
                           <Zap className="h-3 w-3 text-yellow-500" />
                           Vehicle {ev.id}
                         </span>
-                        <span className="text-xs font-medium">
-                          {Math.round(ev.soc * 100)}% → {Math.round(ev.targetSoC * 100)}%
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          {msToPrettyDisplay(ev.finishTimeMs)}
                         </span>
                       </div>
                       <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
@@ -337,6 +340,10 @@ function EVCard({ ev, isCharging = false }: EVCardProps) {
           {isCharging && <Zap className="h-3.5 w-3.5 shrink-0 text-yellow-500" />}
           <p className="text-sm font-bold">Vehicle {ev.id}</p>
         </div>
+        <span className="flex items-center gap-1 text-muted-foreground">
+          <Clock className="h-3 w-3 text-muted-foreground" />
+          {msToPrettyDisplay(ev.finishTimeMs)}
+        </span>
       </CardHeader>
       <CardContent className="px-0 mt-0 py-0">
         <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />

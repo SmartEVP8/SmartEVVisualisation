@@ -9,7 +9,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Slider } from '../ui/slider';
 import { ConfigFormCard } from './ConfigFormCard';
-import { startSimulation, type InitEngineConfig } from '@/api/startSimulation';
+import { startSimulation, type InitEngineConfig } from '@/api/simulationRunner';
 import { getWeights } from '@/api/weights';
 import { setFullWeightsAction } from '@/store/weightStore';
 
