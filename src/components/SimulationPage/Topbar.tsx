@@ -1,17 +1,27 @@
 import { useState } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
+import {
+  globalStatsAtom,
+  simulationTimeAtom,
+} from '@/store/simulationStore';
+import { resetAllStoresAction } from '@/store/resetStore';
 import { Clock, PauseIcon, PlayIcon, Square, Truck, Zap, Pin } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { pauseSimulation, resumeSimulation, stopSimulation } from '@/api/simulationRunner';
-import { globalStatsAtom, simulationTimeAtom } from '@/store/simulationStore';
 import { msToPrettyDisplay } from '@/lib/msToPrettyDisplay';
 
-export function Topbar() {
+type TopbarProps = {
+  onRestartSetup: () => void;
+};
+
+export function Topbar({ onRestartSetup }: TopbarProps) {
   const time = useAtomValue(simulationTimeAtom);
   const simState = useAtomValue(globalStatsAtom);
+  const resetAllStores = useSetAtom(resetAllStoresAction);
+
   const [isTopbarPinned, setIsTopbarPinned] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
@@ -52,13 +62,22 @@ export function Topbar() {
     }
   };
 
+  const handleRestart = () => {
+    setIsStopped(false);
+    setIsPaused(false);
+    setIsSubmitting(false);
+
+    resetAllStores();
+
+    onRestartSetup();
+  };
+
   const isControlDisabled = isStopped || isSubmitting;
 
   return (
     <div className="group relative inline-block">
-      {!isTopbarPinned && (
-        <div className="absolute inset-x-0 -top-2 h-16" />
-      )}
+      {!isTopbarPinned && <div className="absolute inset-x-0 -top-2 h-16" />}
+
       <div
         className={[
           'transition-all duration-200 ease-out',
@@ -75,28 +94,41 @@ export function Topbar() {
             </span>
           </div>
 
-          <Button
-            variant={isPaused ? 'outline' : 'default'}
-            onClick={handlePauseResume}
-            disabled={isControlDisabled}
-          >
-            {isPaused ? (
+          {isStopped ? (
+            <Button
+              variant="default"
+              onClick={handleRestart}
+              disabled={isSubmitting}
+            >
               <PlayIcon className="mr-1 h-4 w-4" />
-            ) : (
-              <PauseIcon className="mr-1 h-4 w-4" />
-            )}
-            {isPaused ? 'Resume' : 'Pause'}
-          </Button>
+              Restart
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant={isPaused ? 'outline' : 'default'}
+                onClick={handlePauseResume}
+                disabled={isControlDisabled}
+              >
+                {isPaused ? (
+                  <PlayIcon className="mr-1 h-4 w-4" />
+                ) : (
+                  <PauseIcon className="mr-1 h-4 w-4" />
+                )}
+                {isPaused ? 'Resume' : 'Pause'}
+              </Button>
 
-          <Button
-            variant="destructive"
-            className="ml-2"
-            onClick={handleStop}
-            disabled={isControlDisabled}
-          >
-            <Square className="mr-1 h-4 w-4" />
-            Stop
-          </Button>
+              <Button
+                variant="destructive"
+                className="ml-2"
+                onClick={handleStop}
+                disabled={isControlDisabled}
+              >
+                <Square className="mr-1 h-4 w-4" />
+                Stop
+              </Button>
+            </>
+          )}
 
           <div className="flex items-center gap-4 px-5">
             <Clock className="h-5 w-5 shrink-0 text-muted-foreground" />
@@ -120,7 +152,7 @@ export function Topbar() {
             variant={isTopbarPinned ? 'default' : 'ghost'}
             size="icon"
             className="ml-3"
-            onClick={() => setIsTopbarPinned(prev => !prev)}
+            onClick={() => setIsTopbarPinned((prev) => !prev)}
             aria-label={isTopbarPinned ? 'Unpin top bar' : 'Pin top bar'}
             title={isTopbarPinned ? 'Unpin top bar' : 'Pin top bar'}
           >

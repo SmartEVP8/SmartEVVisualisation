@@ -1,6 +1,6 @@
 import { atom, createStore, type Atom, type PrimitiveAtom } from 'jotai/vanilla';
 import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
-import type { StationStatus } from '@/components/map/StationMarker';
+import type { StationStatus } from '@/components/map/StationMarkers';
 
 // INFO : Models
 export type Position = {
@@ -264,3 +264,23 @@ export const dispatchWSEventAction = atom(
     }
   },
 );
+
+export const resetSimulationAction = atom(null, (_get, set) => {
+  console.log('Resetting simulation store');
+
+  set(simulationTimeAtom, 0);
+  set(globalStatsAtom, {
+    totalEvs: 0,
+    totalCharging: 0,
+  });
+
+  set(stationsConfigAtom, {});
+  set(chargersConfigAtom, {});
+  set(evsOnRouteAtom, {});
+  set(queueAlertsAtom, {});
+  set(stationQueueLengthsAtom, {});
+
+  for (const chargerStatesAtom of chargerStateAtomCache.values()) {
+    set(chargerStatesAtom, {});
+  }
+});
