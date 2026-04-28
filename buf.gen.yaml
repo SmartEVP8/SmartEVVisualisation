@@ -1,6 +1,8 @@
 version: v2
+inputs:
+  - module: buf.build/smartevp8/api
 plugins:
-  - local: protoc-gen-es
+  - remote: buf.build/bufbuild/es:v2.11.0
     out: src/api/generated
     opt:
       - target=ts
