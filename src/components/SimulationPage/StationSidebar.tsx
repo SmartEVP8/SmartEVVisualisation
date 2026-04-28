@@ -314,7 +314,7 @@ function ChargerCard({ charger, chargerState, isSelected, onSelect }: ChargerCar
                           {msToPrettyDisplay(ev.finishTimeMs)}
                         </span>
                       </div>
-                      <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
+                      <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} startTime={ev.startTime} finishTimeMs={ev.finishTimeMs} />
                     </div>
                   ))}
                 </div>
@@ -346,7 +346,7 @@ function EVCard({ ev, isCharging = false }: EVCardProps) {
         </span>
       </CardHeader>
       <CardContent className="px-0 mt-0 py-0">
-        <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} />
+        <TargetChargeDisplay soc={ev.soc} targetSoC={ev.targetSoC} finishTimeMs={ev.finishTimeMs} startTime={ev.startTime} />
       </CardContent>
     </Card>
   );

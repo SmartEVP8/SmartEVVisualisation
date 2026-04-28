@@ -1,6 +1,6 @@
 import { atom, createStore, type Atom, type PrimitiveAtom } from 'jotai/vanilla';
 import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
-import type { StationStatus } from '@/components/map/StationMarker';
+import type { StationStatus } from '@/components/map/StationMarkers';
 
 // INFO : Models
 export type Position = {
@@ -28,6 +28,7 @@ export type EVInQueue = {
   id: number;
   soc: number;
   targetSoC: number;
+  startTime?: null | number; // Null for everyone except the charging evs.
   finishTimeMs: number;
 };
 
@@ -170,6 +171,7 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       soc: ev.soc,
       targetSoC: ev.targetSoc,
       finishTimeMs: ev.finishTimeMs,
+      startTime: null,
     }));
 
     const chargingEVs: EVInQueue[] = cs.evsCharging.map((ev) => ({
@@ -177,6 +179,7 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       soc: ev.soc,
       targetSoC: ev.targetSoc,
       finishTimeMs: ev.finishTimeMs,
+      startTime: ev.startTimeMs,
     }));
 
     stationChargerStates[cs.chargerId] = {

@@ -13,6 +13,21 @@ export async function apiGet<T>(path: string): Promise<T> {
 }
 
 
+export async function apiGetBinary(path: string, params?: Record<string, unknown>): Promise<Uint8Array> {
+  const url = new URL(`${API_BASE_URL}${path}`);
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, String(value));
+    });
+  }
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
+}
+
 // Generic POST request function that sends JSON and returns a typed response
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
