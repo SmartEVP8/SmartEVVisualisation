@@ -1,5 +1,5 @@
 import { atom, createStore, type Atom, type PrimitiveAtom } from 'jotai/vanilla';
-import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/api_pb';
+import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/protocol/api_pb';
 import type { StationStatus } from '@/components/map/StationMarkers';
 
 // INFO : Models

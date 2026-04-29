@@ -1,6 +1,6 @@
 import { dispatchWSEventAction, simulationStore } from "@/store/simulationStore.ts";
 import { fromBinary } from "@bufbuild/protobuf";
-import { EnvelopeSchema, type Envelope } from "./generated/api_pb";
+import { EnvelopeSchema, type Envelope } from "./generated/protocol/api_pb";
 
 // TODO : BASEURL SHOULD PROBABLY BE GLOBAL
 const WS_URL = "ws://localhost:5000/ws/simulation";
