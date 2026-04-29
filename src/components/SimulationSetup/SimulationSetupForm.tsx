@@ -21,7 +21,7 @@ const SIMULATION_MIN_TIME = 0;
 const SIMULATION_START_MAX_TIME = MILLISECONDS_PER_DAY * 6;
 const SIMULATION_END_MAX_TIME = MILLISECONDS_PER_DAY * 7;
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const simulationConfigSchema = (weightMetadata: WeightMetadata[]) =>
   z
@@ -109,7 +109,7 @@ const createInitialConfig = (): InitEngineConfig => ({
   maximumEVs: 50000,
   seed: 42,
   startTime: MILLISECONDS_PER_DAY,
-  endTime: MILLISECONDS_PER_DAY * 7,
+  endTime: MILLISECONDS_PER_DAY * 6,
 });
 
 function formatSliderValue(value: number) {
@@ -463,7 +463,6 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                 minTime={SIMULATION_MIN_TIME}
                 maxTime={SIMULATION_END_MAX_TIME}
                 dayOptions={DAYS}
-                formatDayLabel={(day, index) => (index === 7 ? 'Next Sunday' : day)}
                 onChange={(endTime) =>
                   setConfig((prev) => ({
                     ...prev,
