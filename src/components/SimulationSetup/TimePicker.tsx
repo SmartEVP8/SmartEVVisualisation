@@ -1,4 +1,4 @@
-import * as Form from '@radix-ui/react-form';
+import { Form } from 'radix-ui';
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -67,12 +67,12 @@ export function TimePickerField({
     const [hourInput, setHourInput] = useState<string | null>(null);
     const [minuteInput, setMinuteInput] = useState<string | null>(null);
 
-    const displayedHourInput = hourInput ?? '';
-    const displayedMinuteInput = minuteInput ?? '';
+    const displayHour = hourInput ?? String(hour).padStart(2, '0');
+    const displayMinute = minuteInput ?? String(minute).padStart(2, '0');
 
     const commitTime = (nextDay: number, nextHourRaw: string, nextMinuteRaw: string) => {
-        const parsedHour = nextHourRaw === '' ? hour : Number(nextHourRaw);
-        const parsedMinute = nextMinuteRaw === '' ? minute : Number(nextMinuteRaw);
+        const parsedHour = Number(nextHourRaw);
+        const parsedMinute = Number(nextMinuteRaw);
 
         const nextHour = Number.isFinite(parsedHour) ? clamp(parsedHour, 0, 23) : 0;
         const nextMinute = Number.isFinite(parsedMinute) ? clamp(parsedMinute, 0, 59) : 0;
@@ -85,6 +85,7 @@ export function TimePickerField({
 
         setHourInput(null);
         setMinuteInput(null);
+
         onChange(nextValue);
     };
 
@@ -105,11 +106,7 @@ export function TimePickerField({
                 <select
                     value={day}
                     onChange={(event) => {
-                        commitTime(
-                            Number(event.target.value),
-                            displayedHourInput,
-                            displayedMinuteInput,
-                        );
+                        commitTime(Number(event.target.value), displayHour, displayMinute);
                     }}
                     className="h-12 rounded-2xl border border-border/80 bg-background/80 px-4 text-sm font-semibold shadow-inner outline-none transition focus:border-primary/70 focus:ring-2 focus:ring-primary/20"
                 >
@@ -123,9 +120,14 @@ export function TimePickerField({
                 <Input
                     type="text"
                     inputMode="numeric"
-                    value={displayedHourInput}
-                    onChange={(event) => handleNumericInputChange(event.target.value, setHourInput)}
-                    onBlur={() => commitTime(day, displayedHourInput, displayedMinuteInput)}
+                    value={displayHour}
+                    onFocus={() => {
+                        if (displayHour === '00') {
+                            setHourInput('');
+                        }
+                    }}
+                    onChange={(e) => handleNumericInputChange(e.target.value, setHourInput)}
+                    onBlur={() => commitTime(day, displayHour, displayMinute)}
                     className="h-12 rounded-2xl border-border/80 bg-background/80 text-center text-sm font-semibold tabular-nums shadow-inner"
                     placeholder="HH"
                 />
@@ -133,9 +135,13 @@ export function TimePickerField({
                 <Input
                     type="text"
                     inputMode="numeric"
-                    value={displayedMinuteInput}
-                    onChange={(event) => handleNumericInputChange(event.target.value, setMinuteInput)}
-                    onBlur={() => commitTime(day, displayedHourInput, displayedMinuteInput)}
+                    value={displayMinute}
+                    onFocus={() => {
+                        if (displayMinute === '00') {
+                            setMinuteInput('');
+                        }
+                    }}
+                    onBlur={() => commitTime(day, displayHour, displayMinute)}
                     className="h-12 rounded-2xl border-border/80 bg-background/80 text-center text-sm font-semibold tabular-nums shadow-inner"
                     placeholder="MM"
                 />

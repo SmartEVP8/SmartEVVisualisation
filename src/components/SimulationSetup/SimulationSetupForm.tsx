@@ -201,7 +201,36 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                   <Input
                     type="number"
                     value={config.maximumEVs}
-                    onChange={(event) => setConfig((prev) => ({ ...prev, maximumEVs: Number(event.target.value) }))}
+                    onFocus={(e) => {
+                      if (e.currentTarget.value === config.maximumEVs.toString()) {
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const raw = e.currentTarget.value.trim();
+
+                      if (raw === '') {
+                        setConfig((prev) => ({
+                          ...prev,
+                          maximumEVs: createInitialConfig().maximumEVs,
+                        }));
+                        return;
+                      }
+
+                      const parsedValue = Number(raw);
+                      if (Number.isNaN(parsedValue)) return;
+
+                      setConfig((prev) => ({
+                        ...prev,
+                        maximumEVs: clamp(parsedValue, 1, 550000),
+                      }));
+                    }}
+                    onChange={(event) =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        maximumEVs: Number(event.target.value),
+                      }))
+                    }
                     className="h-11 rounded-2xl border-border/80 bg-background/80 px-4 text-center text-sm font-semibold tabular-nums"
                   />
                 </Form.Control>
@@ -215,7 +244,36 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                   <Input
                     type="number"
                     value={config.seed}
-                    onChange={(event) => setConfig((prev) => ({ ...prev, seed: Number(event.target.value) }))}
+                    onFocus={(e) => {
+                      if (e.currentTarget.value === config.seed.toString()) {
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const raw = e.currentTarget.value.trim();
+
+                      if (raw === '') {
+                        setConfig((prev) => ({
+                          ...prev,
+                          seed: createInitialConfig().seed,
+                        }));
+                        return;
+                      }
+
+                      const parsedValue = Number(raw);
+                      if (Number.isNaN(parsedValue)) return;
+
+                      setConfig((prev) => ({
+                        ...prev,
+                        seed: Math.max(0, parsedValue),
+                      }));
+                    }}
+                    onChange={(event) =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        seed: Number(event.target.value),
+                      }))
+                    }
                     className="h-11 rounded-2xl border-border/80 bg-background/80 px-4 text-center text-sm font-semibold tabular-nums"
                   />
                 </Form.Control>
@@ -229,7 +287,36 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                   <Input
                     type="number"
                     value={config.numberOfChargers}
-                    onChange={(event) => setConfig((prev) => ({ ...prev, numberOfChargers: Number(event.target.value) }))}
+                    onFocus={(e) => {
+                      if (e.currentTarget.value === config.numberOfChargers.toString()) {
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const raw = e.currentTarget.value.trim();
+
+                      if (raw === '') {
+                        setConfig((prev) => ({
+                          ...prev,
+                          numberOfChargers: createInitialConfig().numberOfChargers,
+                        }));
+                        return;
+                      }
+
+                      const parsedValue = Number(raw);
+                      if (Number.isNaN(parsedValue)) return;
+
+                      setConfig((prev) => ({
+                        ...prev,
+                        numberOfChargers: clamp(parsedValue, 1, 7500),
+                      }));
+                    }}
+                    onChange={(event) =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        numberOfChargers: Number(event.target.value),
+                      }))
+                    }
                     className="h-11 rounded-2xl border-border/80 bg-background/80 px-4 text-center text-sm font-semibold tabular-nums"
                   />
                 </Form.Control>
@@ -245,6 +332,30 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                     min={1}
                     max={navigator.hardwareConcurrency || 1}
                     value={config.processorCount}
+                    onFocus={(e) => {
+                      if (e.currentTarget.value === config.processorCount.toString()) {
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const raw = e.currentTarget.value.trim();
+
+                      if (raw === '') {
+                        setConfig((prev) => ({
+                          ...prev,
+                          processorCount: createInitialConfig().processorCount,
+                        }));
+                        return;
+                      }
+
+                      const parsedValue = Number(raw);
+                      if (Number.isNaN(parsedValue)) return;
+
+                      setConfig((prev) => ({
+                        ...prev,
+                        processorCount: clamp(parsedValue, 1, navigator.hardwareConcurrency || 1),
+                      }));
+                    }}
                     onChange={(event) =>
                       setConfig((prev) => ({
                         ...prev,
@@ -283,6 +394,30 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                     max={1}
                     step={0.1}
                     value={formatSliderValue(config.dualChargerProbability)}
+                    onFocus={(e) => {
+                      if (e.currentTarget.value === formatSliderValue(config.dualChargerProbability)) {
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const raw = e.currentTarget.value.trim();
+
+                      if (raw === '') {
+                        setConfig((prev) => ({
+                          ...prev,
+                          dualChargerProbability: createInitialConfig().dualChargerProbability,
+                        }));
+                        return;
+                      }
+
+                      const parsedValue = Number(raw);
+                      if (Number.isNaN(parsedValue)) return;
+
+                      setConfig((prev) => ({
+                        ...prev,
+                        dualChargerProbability: clamp(parsedValue, 0, 1),
+                      }));
+                    }}
                     onChange={(event) => {
                       const rawValue = event.target.value;
                       if (!/^\d*\.?\d*$/.test(rawValue)) return;
@@ -389,9 +524,46 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
                           min={weight.min}
                           max={weight.max}
                           step={0.1}
-                          value={value}
+                          value={formatSliderValue(value)}
+                          onFocus={(e) => {
+                            if (e.currentTarget.value === formatSliderValue(value)) {
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                          onBlur={(e) => {
+                            const raw = e.currentTarget.value.trim();
+
+                            if (raw === '') {
+                              setConfig((prev) => ({
+                                ...prev,
+                                costWeights: prev.costWeights.map((item) =>
+                                  item.costId === weight.id ? { ...item, value: weight.min } : item
+                                ),
+                              }));
+                              return;
+                            }
+
+                            const parsedValue = Number(raw);
+                            if (Number.isNaN(parsedValue)) return;
+
+                            setConfig((prev) => ({
+                              ...prev,
+                              costWeights: prev.costWeights.map((item) =>
+                                item.costId === weight.id
+                                  ? {
+                                    ...item,
+                                    value: clamp(parsedValue, weight.min, weight.max),
+                                  }
+                                  : item
+                              ),
+                            }));
+                          }}
                           onChange={(event) => {
-                            const nextValue = Number(event.target.value);
+                            const rawValue = event.target.value;
+                            if (!/^\d*\.?\d*$/.test(rawValue)) return;
+
+                            const nextValue = Number(rawValue);
+                            if (Number.isNaN(nextValue)) return;
 
                             setConfig((prev) => ({
                               ...prev,
