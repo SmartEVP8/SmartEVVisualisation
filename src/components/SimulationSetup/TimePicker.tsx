@@ -141,6 +141,7 @@ export function TimePickerField({
                             setMinuteInput('');
                         }
                     }}
+                    onChange={(e) => handleNumericInputChange(e.target.value, setMinuteInput)}
                     onBlur={() => commitTime(day, displayHour, displayMinute)}
                     className="h-12 rounded-2xl border-border/80 bg-background/80 text-center text-sm font-semibold tabular-nums shadow-inner"
                     placeholder="MM"
