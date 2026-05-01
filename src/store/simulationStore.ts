@@ -266,8 +266,6 @@ export const dispatchWSEventAction = atom(
 );
 
 export const resetSimulationAction = atom(null, (_get, set) => {
-  console.log('Resetting simulation store');
-
   set(simulationTimeAtom, 0);
   set(globalStatsAtom, {
     totalEvs: 0,

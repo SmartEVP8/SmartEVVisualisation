@@ -5,7 +5,6 @@ import { apiPost, apiPostBinary } from './client';
 import { EnvelopeSchema } from './generated/protocol/api_pb';
 
 export type InitEngineConfig = {
-  maximumEVs: number;
   seed: number;
   dualChargerProbability: number;
   numberOfChargers: number;
@@ -42,8 +41,6 @@ async function initSimulation(config: InitEngineConfig) {
         : 'Envelope payload was empty'
     );
   }
-
-  console.log('Received init engine data:', envelope.payload.value);
 
   return envelope.payload;
 }

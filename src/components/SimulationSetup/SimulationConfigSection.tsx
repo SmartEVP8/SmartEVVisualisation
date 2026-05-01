@@ -17,36 +17,6 @@ export function SimulationConfigSection({ config, setConfig }: Props) {
             <h2 className="mb-5 text-xl font-semibold">Simulation Config</h2>
 
             <div className="grid gap-4">
-                <Form.Field name="maximumEVs" className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-4">
-                    <Form.Label asChild>
-                        <Label className="text-sm font-semibold">Number of EVs</Label>
-                    </Form.Label>
-                    <Form.Control asChild>
-                        <Input
-                            type="number"
-                            value={config.maximumEVs}
-                            onFocus={(e) => {
-                                if (e.currentTarget.value === config.maximumEVs.toString()) e.currentTarget.value = '';
-                            }}
-                            onBlur={(e) => {
-                                const raw = e.currentTarget.value.trim();
-
-                                if (raw === '') {
-                                    setConfig((prev) => ({ ...prev, maximumEVs: createInitialConfig().maximumEVs }));
-                                    return;
-                                }
-
-                                const parsedValue = Number(raw);
-                                if (Number.isNaN(parsedValue)) return;
-
-                                setConfig((prev) => ({ ...prev, maximumEVs: clamp(parsedValue, 1, 550000) }));
-                            }}
-                            onChange={(event) => setConfig((prev) => ({ ...prev, maximumEVs: Number(event.target.value) }))}
-                            className="h-11 rounded-2xl border-border/80 bg-background/80 px-4 text-center text-sm font-semibold tabular-nums"
-                        />
-                    </Form.Control>
-                </Form.Field>
-
                 <Form.Field name="seed" className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-4">
                     <Form.Label asChild>
                         <Label className="text-sm font-semibold">Seed</Label>

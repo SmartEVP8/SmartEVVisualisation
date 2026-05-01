@@ -16,7 +16,6 @@ export const createInitialConfig = (): InitEngineConfig => ({
     dualChargerProbability: 0.8,
     numberOfChargers: 5000,
     processorCount: navigator.hardwareConcurrency || 1,
-    maximumEVs: 50000,
     seed: 42,
     startTime: MILLISECONDS_PER_DAY,
     endTime: MILLISECONDS_PER_DAY * 6,
@@ -33,7 +32,6 @@ export function formatSliderValue(value: number) {
 export const simulationConfigSchema = (weightMetadata: WeightMetadata[]) =>
     z
         .object({
-            maximumEVs: z.number().int().min(1).max(550000),
             seed: z.number().int().min(0),
             dualChargerProbability: z.number().min(0).max(1),
             numberOfChargers: z.number().int().min(1).max(7500),

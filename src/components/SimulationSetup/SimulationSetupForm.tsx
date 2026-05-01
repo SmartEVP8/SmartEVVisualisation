@@ -83,7 +83,7 @@ export function SimulationSetupForm({ closeOnSimulationStart }: SimulationSetupF
       className="w-full max-w-[1100px] max-h-[calc(100vh-12px)]"
     >
       <Form.Root
-        className="-mt-6 flex flex-col gap-4"
+        className="flex flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           handleStart();

@@ -66,9 +66,7 @@ export function Topbar({ onRestartSetup }: TopbarProps) {
     setIsStopped(false);
     setIsPaused(false);
     setIsSubmitting(false);
-
     resetAllStores();
-
     onRestartSetup();
   };
 
