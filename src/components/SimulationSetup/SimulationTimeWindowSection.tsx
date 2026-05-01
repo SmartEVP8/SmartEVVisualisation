@@ -1,7 +1,15 @@
-import { Form } from 'radix-ui';
+import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
+import { Form } from 'radix-ui';
+import type { InitEngineConfig } from '@/api/simulationRunner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import {
+    DAYS,
+    SIMULATION_END_MAX_TIME,
+    SIMULATION_MIN_TIME,
+    SIMULATION_START_MAX_TIME,
+} from './simulationSetupConfig';
 
 const MILLISECONDS_PER_MINUTE = 60 * 1000;
 const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
@@ -12,11 +20,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function toSimulationTimeMs(day: number, hour: number, minute = 0) {
-    return (
-        day * MILLISECONDS_PER_DAY +
-        hour * MILLISECONDS_PER_HOUR +
-        minute * MILLISECONDS_PER_MINUTE
-    );
+    return day * MILLISECONDS_PER_DAY + hour * MILLISECONDS_PER_HOUR + minute * MILLISECONDS_PER_MINUTE;
 }
 
 function getDayFromMs(value: number) {
@@ -47,19 +51,9 @@ type TimePickerFieldProps = {
     maxTime: number;
     dayOptions: string[];
     onChange: (value: number) => void;
-    formatDayLabel?: (day: string, index: number) => string;
 };
 
-export function TimePickerField({
-    name,
-    label,
-    value,
-    minTime,
-    maxTime,
-    dayOptions,
-    onChange,
-    formatDayLabel = (day) => day,
-}: TimePickerFieldProps) {
+function TimePickerField({ name, label, value, minTime, maxTime, dayOptions, onChange }: TimePickerFieldProps) {
     const day = getDayFromMs(value);
     const hour = getHourFromMs(value);
     const minute = getMinuteFromMs(value);
@@ -77,11 +71,7 @@ export function TimePickerField({
         const nextHour = Number.isFinite(parsedHour) ? clamp(parsedHour, 0, 23) : 0;
         const nextMinute = Number.isFinite(parsedMinute) ? clamp(parsedMinute, 0, 59) : 0;
 
-        const nextValue = clamp(
-            toSimulationTimeMs(nextDay, nextHour, nextMinute),
-            minTime,
-            maxTime,
-        );
+        const nextValue = clamp(toSimulationTimeMs(nextDay, nextHour, nextMinute), minTime, maxTime);
 
         setHourInput(null);
         setMinuteInput(null);
@@ -91,7 +81,7 @@ export function TimePickerField({
 
     const handleNumericInputChange = (
         rawValue: string,
-        setter: React.Dispatch<React.SetStateAction<string | null>>,
+        setter: React.Dispatch<React.SetStateAction<string | null>>
     ) => {
         setter(rawValue.replace(/\D/g, '').slice(0, 2));
     };
@@ -112,7 +102,7 @@ export function TimePickerField({
                 >
                     {dayOptions.map((option, index) => (
                         <option key={`${option}-${index}`} value={index}>
-                            {formatDayLabel(option, index)}
+                            {option}
                         </option>
                     ))}
                 </select>
@@ -152,5 +142,40 @@ export function TimePickerField({
                 {formatSimulationTime(value)}
             </p>
         </Form.Field>
+    );
+}
+
+type Props = {
+    config: InitEngineConfig;
+    setConfig: Dispatch<SetStateAction<InitEngineConfig>>;
+};
+
+export function SimulationTimeWindowSection({ config, setConfig }: Props) {
+    return (
+        <section className="rounded-3xl border border-border/60 bg-background/35 p-5">
+            <h2 className="mb-5 text-xl font-semibold">Simulation Time Window</h2>
+
+            <div className="grid gap-5">
+                <TimePickerField
+                    name="startTime"
+                    label="Start Time"
+                    value={config.startTime}
+                    minTime={SIMULATION_MIN_TIME}
+                    maxTime={SIMULATION_START_MAX_TIME}
+                    dayOptions={DAYS.slice(0, 7)}
+                    onChange={(startTime) => setConfig((prev) => ({ ...prev, startTime }))}
+                />
+
+                <TimePickerField
+                    name="endTime"
+                    label="End Time"
+                    value={config.endTime}
+                    minTime={SIMULATION_MIN_TIME}
+                    maxTime={SIMULATION_END_MAX_TIME}
+                    dayOptions={DAYS}
+                    onChange={(endTime) => setConfig((prev) => ({ ...prev, endTime }))}
+                />
+            </div>
+        </section>
     );
 }

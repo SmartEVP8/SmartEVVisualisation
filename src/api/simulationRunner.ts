@@ -43,6 +43,8 @@ async function initSimulation(config: InitEngineConfig) {
     );
   }
 
+  console.log('Received init engine data:', envelope.payload.value);
+
   return envelope.payload;
 }
 
