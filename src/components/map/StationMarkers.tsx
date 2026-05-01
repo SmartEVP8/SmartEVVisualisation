@@ -18,11 +18,6 @@ type MarkerWithStationMeta = L.Marker & {
   };
 };
 
-type MarkerClusterLike = {
-  getAllChildMarkers: () => L.Marker[];
-  getChildCount: () => number;
-};
-
 const CLUSTER_COLOURS = {
   idle: {
     background: '#22c55e',
@@ -207,7 +202,7 @@ function getCachedClusterIcon(
   return icon;
 }
 
-function createClusterCustomIcon(cluster: MarkerClusterLike) {
+function createClusterCustomIcon(cluster: L.MarkerCluster): L.DivIcon {
   const childMarkers = cluster.getAllChildMarkers() as MarkerWithStationMeta[];
 
   let maxSeverity: 0 | 1 | 2 = 0;
@@ -272,7 +267,7 @@ function StationMarkersComponent() {
       maxClusterRadius: 50,
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
-      iconCreateFunction: createClusterCustomIcon as any,
+      iconCreateFunction: createClusterCustomIcon,
       removeOutsideVisibleBounds: true,
       animate: false,
     });

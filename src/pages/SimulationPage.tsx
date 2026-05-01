@@ -82,7 +82,7 @@ export function SimulationPage() {
           })}
       </MapView>
       <div className="absolute top-2 left-1/2 z-1200 -translate-x-1/2">
-        <Topbar />
+        <Topbar onRestartSetup={() => setHasSimStarted(false)} />
       </div>
       <OptionsSidebar onFocusStation={handleFocusPosition} />
 

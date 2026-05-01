@@ -19,3 +19,12 @@ export const clearSelectionAction = atom(
     set(isShowingRoutesAtom, false);
   }
 );
+
+export const resetSimulationUiAction = atom(null, (_get, set) => {
+  set(selectedStationAtom, null);
+  set(selectedChargerIdAtom, null);
+  set(isSidebarCollapsedAtom, false);
+  set(isShowingRoutesAtom, false);
+  set(isWeightSidebarCollapsedAtom, false);
+});
+

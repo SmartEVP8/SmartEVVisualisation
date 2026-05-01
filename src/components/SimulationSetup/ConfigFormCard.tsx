@@ -13,12 +13,12 @@ export function ConfigFormCard({
   className = '',
 }: ConfigFormCardProps) {
   return (
-    <Card className={`mx-auto w-full max-w-lg rounded-[2rem] border-border/70 bg-card/95 shadow-2xl ${className}`}>
-      <CardHeader className="pb-2">
+    <Card className={`mx-auto w-full max-w-3xl rounded-[2rem] border-border/70 bg-card/95 shadow-2xl ${className}`}>
+      <CardHeader className="pb-4">
         <CardTitle className="text-center text-xl">{title}</CardTitle>
       </CardHeader>
 
-      <CardContent className="pt-2">{children}</CardContent>
+      <CardContent className="pt-4 space-y-6">{children}</CardContent>
     </Card>
   );
 }

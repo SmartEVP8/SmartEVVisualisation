@@ -19,7 +19,7 @@ export function startSimulationWS(): WebSocket {
 
   ws.onmessage = async (event: MessageEvent) => {
     try {
-      let buffer: Uint8Array = event.data instanceof Blob
+      const buffer: Uint8Array = event.data instanceof Blob
         ? new Uint8Array(await event.data.arrayBuffer())
         : new Uint8Array(event.data);
 

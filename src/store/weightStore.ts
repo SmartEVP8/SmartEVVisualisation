@@ -24,3 +24,7 @@ export const setSingleWeightAction = atom(
     set(weightMetadataAtom, updatedWeights);
   }
 );
+
+export const resetWeightsAction = atom(null, (_get, set) => {
+  set(weightMetadataAtom, []);
+});
