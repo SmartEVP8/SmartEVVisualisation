@@ -1,5 +1,5 @@
 import { atom, createStore, type Atom, type PrimitiveAtom } from 'jotai/vanilla';
-import type { Envelope, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/protocol/api_pb';
+import type { Envelope, GetEVsInViewPort, InitEngineData, SimulationSnapshot, StationState } from '@/api/generated/protocol/api_pb';
 import type { StationStatus } from '@/components/map/StationMarkers';
 
 // INFO : Models
@@ -28,6 +28,7 @@ export type EVInQueue = {
   id: number;
   soc: number;
   targetSoC: number;
+  startTime?: null | number; // Null for everyone except the charging evs.
   finishTimeMs: number;
 };
 
@@ -170,6 +171,7 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       soc: ev.soc,
       targetSoC: ev.targetSoc,
       finishTimeMs: ev.finishTimeMs,
+      startTime: null,
     }));
 
     const chargingEVs: EVInQueue[] = cs.evsCharging.map((ev) => ({
@@ -177,6 +179,7 @@ export const handleUpdateStationState = atom(null, (get, set, payload: StationSt
       soc: ev.soc,
       targetSoC: ev.targetSoc,
       finishTimeMs: ev.finishTimeMs,
+      startTime: ev.startTimeMs,
     }));
 
     stationChargerStates[cs.chargerId] = {
@@ -246,6 +249,21 @@ export const clearAllQueueAlertsAction = atom(null, (_get, set) => {
   set(queueAlertsAtom, {});
 });
 
+export const evPositionsAtom = atom<Record<number, Position>>({});
+
+export const handleEVPositionsAction = atom(
+  null,
+  (_get, set, payload: GetEVsInViewPort) => {
+    const positions: Record<number, Position> = {};
+    for (const ev of payload.evPositions) {
+      if (ev.pos) {
+        positions[ev.evId] = { lat: ev.pos.lat, lon: ev.pos.lon };
+      }
+    }
+    set(evPositionsAtom, positions);
+  },
+);
+
 export const dispatchWSEventAction = atom(
   null,
   (_get, set, payload: Exclude<Envelope['payload'], { case: undefined }>) => {
@@ -258,6 +276,9 @@ export const dispatchWSEventAction = atom(
         break;
       case 'initEngineData':
         set(handleInitEngineDataAction, payload.value);
+        break;
+      case 'getEvsInViewport':
+        set(handleEVPositionsAction, payload.value);
         break;
       default:
         console.warn('Unhandled event type routed to store:', payload);
